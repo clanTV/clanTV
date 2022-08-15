@@ -78,7 +78,14 @@ public class OkGoHelper {
                 return "https://doh.360.cn/dns-query";
             }
             case 4: {
-                return "https://1.1.1.1/dns-query";   // takagen99
+                // return "https://1.1.1.1/dns-query";   // takagen99 - removed Cloudflare
+                return "https://dns.google/dns-query";
+            }
+            case 5: {
+                return "https://dns.adguard.com/dns-query";
+            }
+            case 6: {
+                return "https://dns.quad9.net/dns-query";
             }
         }
         return "";
@@ -89,6 +96,9 @@ public class OkGoHelper {
         dnsHttpsList.add("腾讯");
         dnsHttpsList.add("阿里");
         dnsHttpsList.add("360");
+        dnsHttpsList.add("Google");
+        dnsHttpsList.add("AdGuard");
+        dnsHttpsList.add("Quad9");
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor("OkExoPlayer");
         if (Hawk.get(HawkConfig.DEBUG_OPEN, false)) {

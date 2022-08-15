@@ -29,7 +29,7 @@
             android:layout_height="@dimen/vs_50"
             android:drawablePadding="@dimen/vs_10"
             android:gravity="center"
-            android:text="收藏夹"
+            android:text="@string/act_fav"
             android:textColor="@android:color/white"
             android:textSize="@dimen/ts_34"
             android:textStyle="bold" />
@@ -48,7 +48,7 @@
             android:focusable="false"
             android:focusableInTouchMode="false"
             android:gravity="center"
-            android:text="确定键删除当前选中收藏"
+            android:text="@string/act_fav_sel"
             android:textColor="@android:color/white"
             android:textSize="@dimen/ts_24"
             android:visibility="gone" />
@@ -63,7 +63,7 @@
             android:focusableInTouchMode="false"
             android:gravity="center"
             android:padding="@dimen/vs_10"
-            android:text="删除收藏"
+            android:text="@string/act_fav_rm"
             android:textColor="@android:color/white"
             android:textSize="@dimen/ts_24" />
     </LinearLayout>

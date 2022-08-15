@@ -4,6 +4,7 @@
     <string name="app_home">Home</string>
     <string name="app_source"></string>
 
+    // Home Page //
     <string name="hm_ok">Load Complete</string>
     <string name="hm_notok">Load Fail</string>
     <string name="hm_retry">Retry</string>
@@ -11,7 +12,15 @@
     <string name="hm_exit">Press BACK again to EXIT</string>
     <string name="hm_date1">dd MMM yyyy</string>
     <string name="hm_date2">EE hh:mm aa</string>
+    <string name="hm_hist">History</string>
+    <string name="hm_live">Live</string>
+    <string name="hm_search">Search</string>
+    <string name="hm_push">Push</string>
+    <string name="hm_file">File</string>
+    <string name="hm_fav">Star</string>
+    <string name="hm_setting">Menu</string>
 
+    // Play Detail Page //
     <string name="det_play">Play</string>
     <string name="det_expand">Expand</string>
     <string name="det_search">Search</string>
@@ -22,18 +31,72 @@
     <string name="det_fav_star">★ Favorite</string>
     <string name="det_fav_unstar">☆ Favorite</string>
 
-    <string name="set_home">Home Source</string>
+    // Settings Menu Page //
+    <string name="mn_config">Configuration Address</string>
+    <string name="mn_home">Source</string>
+    <string name="mn_home_show">Source Display</string>
+    <string name="mn_home_type">Type</string>
+    <string name="mn_history_num">History</string>
+    <string name="mn_wall_change">Wallpaper</string>
+    <string name="mn_wall_load">Loading Wallpaper</string>
+    <string name="mn_wall_reset">Reset</string>
+    <string name="mn_play_type">Player</string>
+    <string name="mn_play_decode">Decode</string>
+    <string name="mn_search">Search Display</string>
+    <string name="mn_ratio">Screen Ratio</string>
+    <string name="mn_preview">Preview Window</string>
+    <string name="mn_webview">WebView</string>
+    <string name="mn_render">Render</string>
+    <string name="mn_backup">Backup/Restore</string>
+    <string name="mn_dns">DNS</string>
+    <string name="mn_locale">Language</string>
+    <string name="mn_about">About</string>
 
+    // Settings Dialog Pop-Up //
+    <string name="dia_source">Select Source</string>
+    <string name="dia_hm_type">Select Display Type</string>
+    <string name="dia_history">Select History to Keep</string>
+    <string name="dia_player">Select Player Type</string>
+    <string name="dia_decode">Select IJK Decoder</string>
+    <string name="dia_search">Select Search Mode</string>
+    <string name="dia_ratio">Select Screen Ratio</string>
+    <string name="dia_render">Select Render Mode</string>
+    <string name="dia_bkres">Backup / Restore</string>
+    <string name="dia_bkpkg">Select Backup Package</string>
+    <string name="dia_dns">Select DNS</string>
+    <string name="dia_locale">Select Language</string>
+
+    // Settings Backup Restore Page //
     <string name="set_bkup_ok">Backup Success</string>
     <string name="set_bkup_fail">Backup Fail</string>
     <string name="set_bkup_fail_hk">Backup Fail (Hawk)</string>
     <string name="set_bkup_fail_db">Backup Fail (DB)</string>
     <string name="set_rest_ok">Restore Success, please Restart</string>
-    <string name="set_rest_fail">Restore Fail</string>
     <string name="set_rest_fail_hk">Restore Fail (Hawk)</string>
     <string name="set_rest_fail_db">Restore Fail (DB)</string>
     <string name="set_permission_ok">Write Permission Granted</string>
     <string name="set_permission_fail1">Failed to get Permission</string>
     <string name="set_permission_fail2">Failed to get Permission, please grant in Settings</string>
 
+
+    // Activity Page //
+    <string name="act_fav">Favorite</string>
+    <string name="act_fav_sel">Select to</string>
+    <string name="act_fav_rm">Remove</string>
+    <string name="act_drive">Folder</string>
+    <string name="act_hist">History</string>
+    <string name="act_hist_sel">Select to</string>
+    <string name="act_hist_rm">Remove</string>
+    <string name="act_search">Search</string>
+    <string name="act_search_clr">Clear</string>
+    <string name="act_search_del">Backspace</string>
+    <string name="act_search_rem">Remote</string>
+    <string name="act_search_trend">Trending</string>
+    <string name="act_search_txt">Enter Search Title</string>
+    <string name="act_settings">Settings</string>
+    <string name="act_home">Home</string>
+    <string name="act_player">Player</string>
+    <string name="act_system">System</string>
+
 </resources>
+

@@ -234,6 +234,9 @@ public class SourceViewModel extends ViewModel {
     }
     // categoryContent
     public void getList(MovieSort.SortData sortData, int page) {
+        if(sortData == null){
+            return;
+        }
         SourceBean homeSourceBean = ApiConfig.get().getHomeSourceBean();
         int type = homeSourceBean.getType();
         if (type == 3) {
@@ -768,7 +771,7 @@ public class SourceViewModel extends ViewModel {
 
     private AbsSortXml sortXml(MutableLiveData<AbsSortXml> result, String xml) {
         try {
-            XStream xstream = new XStream(new DomDriver());//创建Xstram对象
+            XStream xstream = new XStream(new DomDriver());//创建XStream对象
             xstream.autodetectAnnotations(true);
             xstream.processAnnotations(AbsSortXml.class);
             xstream.ignoreUnknownElements();
@@ -808,7 +811,7 @@ public class SourceViewModel extends ViewModel {
                         for (String s : str) {
                             String[] ss = s.split("\\$");
                             if (ss.length > 0) {
-                                if (ss.length == 2) {
+                                if (ss.length >= 2) {
                                     infoBeanList.add(new Movie.Video.UrlBean.UrlInfo.InfoBean(ss[0], ss[1]));
                                 } else if (ss.length == 1) {
                                     infoBeanList.add(new Movie.Video.UrlBean.UrlInfo.InfoBean((infoBeanList.size() + 1) + "", ss[0]));
@@ -874,7 +877,7 @@ public class SourceViewModel extends ViewModel {
 
     private AbsXml xml(MutableLiveData<AbsXml> result, String xml, String sourceKey) {
         try {
-            XStream xstream = new XStream(new DomDriver());//创建Xstram对象
+            XStream xstream = new XStream(new DomDriver());//创建Xstream对象
             xstream.autodetectAnnotations(true);
             xstream.processAnnotations(AbsXml.class);
             xstream.ignoreUnknownElements();

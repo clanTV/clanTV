@@ -170,15 +170,22 @@ public class PlayActivity extends BaseActivity {
         mController.setListener(new VodController.VodControlListener() {
             @Override
             public void playNext(boolean rmProgress) {
-                String preProgressKey = progressKey;
-                PlayActivity.this.playNext();
-                if (rmProgress && preProgressKey != null)
-                    CacheManager.delete(MD5.string2MD5(preProgressKey));
+                if (mVodInfo.reverseSort) {
+                    PlayActivity.this.playPrevious();
+                } else {
+                    String preProgressKey = progressKey;
+                    PlayActivity.this.playNext();
+                    if (rmProgress && preProgressKey != null) CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
+                }
             }
 
             @Override
             public void playPre() {
-                PlayActivity.this.playPrevious();
+                if (mVodInfo.reverseSort) {
+                    PlayActivity.this.playNext();
+                } else {
+                    PlayActivity.this.playPrevious();
+                }
             }
 
             @Override
@@ -249,6 +256,8 @@ public class PlayActivity extends BaseActivity {
                     if (url != null) {
                         try {
                             int playerType = mVodPlayerCfg.getInt("pl");
+                            // takagen99: Check for External Player
+                            extPlay = false;
                             if (playerType >= 10) {
                                 VodInfo.VodSeries vs = mVodInfo.seriesMap.get(mVodInfo.playFlag).get(mVodInfo.playIndex);
                                 String playTitle = mVodInfo.name + " : " + vs.name;
@@ -256,10 +265,12 @@ public class PlayActivity extends BaseActivity {
                                 boolean callResult = false;
                                 switch (playerType) {
                                     case 10: {
+                                        extPlay = true;
                                         callResult = MXPlayer.run(PlayActivity.this, url, playTitle, playSubtitle, headers);
                                         break;
                                     }
                                     case 11: {
+                                        extPlay = true;
                                         callResult = ReexPlayer.run(PlayActivity.this, url, playTitle, playSubtitle, headers);
                                         break;
                                     }
@@ -379,13 +390,14 @@ public class PlayActivity extends BaseActivity {
         mController.setPlayerConfig(mVodPlayerCfg);
     }
 
-    // takagen99
+    // takagen99 : Add check for external players not enter PIP
+    private boolean extPlay = false;
     public boolean supportsPiPMode() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
     @Override
     public void onUserLeaveHint () {
-        if (supportsPiPMode()) {
+        if (supportsPiPMode() && !extPlay) {
             enterPictureInPictureMode();
         }
     }
@@ -541,7 +553,7 @@ public class PlayActivity extends BaseActivity {
         playUrl(null, null);
         String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
         //重新播放清除现有进度
-        if (reset) {CacheManager.delete(MD5.string2MD5(progressKey));}
+        if (reset) {CacheManager.delete(MD5.string2MD5(progressKey), 0);}
         if(vs.url.startsWith("tvbox-drive://")) {
             mController.showParse(false);
             HashMap<String, String> headers = null;

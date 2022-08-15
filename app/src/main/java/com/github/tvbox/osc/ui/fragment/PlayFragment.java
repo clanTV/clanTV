@@ -153,15 +153,22 @@ public class PlayFragment extends BaseLazyFragment {
         mController.setListener(new VodController.VodControlListener() {
             @Override
             public void playNext(boolean rmProgress) {
-                String preProgressKey = progressKey;
-                PlayFragment.this.playNext();
-                if (rmProgress && preProgressKey != null)
-                    CacheManager.delete(MD5.string2MD5(preProgressKey));
+                if (mVodInfo.reverseSort) {
+                    PlayFragment.this.playPrevious();
+                } else {
+                    String preProgressKey = progressKey;
+                    PlayFragment.this.playNext();
+                    if (rmProgress && preProgressKey != null) CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
+                }
             }
 
             @Override
             public void playPre() {
-                PlayFragment.this.playPrevious();
+                if (mVodInfo.reverseSort) {
+                    PlayFragment.this.playNext();
+                } else {
+                    PlayFragment.this.playPrevious();
+                }
             }
 
             @Override
@@ -233,6 +240,8 @@ public class PlayFragment extends BaseLazyFragment {
                     if (url != null) {
                         try {
                             int playerType = mVodPlayerCfg.getInt("pl");
+                            // takagen99: Check for External Player
+                            extPlay = false;
                             if (playerType >= 10) {
                                 VodInfo.VodSeries vs = mVodInfo.seriesMap.get(mVodInfo.playFlag).get(mVodInfo.playIndex);
                                 String playTitle = mVodInfo.name + " : " + vs.name;
@@ -240,10 +249,12 @@ public class PlayFragment extends BaseLazyFragment {
                                 boolean callResult = false;
                                 switch (playerType) {
                                     case 10: {
+                                        extPlay = true;
                                         callResult = MXPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
                                         break;
                                     }
                                     case 11: {
+                                        extPlay = true;
                                         callResult = ReexPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
                                         break;
                                     }
@@ -383,6 +394,7 @@ public class PlayFragment extends BaseLazyFragment {
     }
 
     // takagen99 : Picture-in-Picture support
+    public boolean extPlay;
     @Override
     public void onStop() {
         super.onStop();
@@ -488,7 +500,7 @@ public class PlayFragment extends BaseLazyFragment {
         playUrl(null, null);
         String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
         //重新播放清除现有进度
-        if (reset) CacheManager.delete(MD5.string2MD5(progressKey));
+        if (reset) CacheManager.delete(MD5.string2MD5(progressKey), 0);
         if (Thunder.play(vs.url, new Thunder.ThunderCallback() {
             @Override
             public void status(int code, String info) {

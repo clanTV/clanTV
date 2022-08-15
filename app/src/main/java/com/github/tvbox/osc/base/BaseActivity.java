@@ -20,15 +20,18 @@ import com.github.tvbox.osc.R;
 import com.github.tvbox.osc.callback.EmptyCallback;
 import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.util.AppManager;
+import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.LocaleHelper;
 import com.kingja.loadsir.callback.Callback;
 import com.kingja.loadsir.core.LoadService;
 import com.kingja.loadsir.core.LoadSir;
+import com.orhanobut.hawk.Hawk;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.Math;
 
 import me.jessyan.autosize.AutoSizeCompat;
 import me.jessyan.autosize.internal.CustomAdapt;
@@ -42,23 +45,20 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
     protected Context mContext;
     private LoadService mLoadService;
 
-    // takagen : Language Changer : WIP
-    //Context lContext;
-    //Resources lRresources;
-    //@Override
-    //protected void attachBaseContext(Context base) {
-    //    super.attachBaseContext(LocaleHelper.onAttach(base, "zh"));
-    //}
-
     private static float screenRatio = -100.0f;
+
+    // takagen99 : Fix for Locale change not persist on higher Android version
+    @Override
+    protected void attachBaseContext(Context base) {
+        if (Hawk.get(HawkConfig.HOME_LOCALE, 0) == 0) {
+            super.attachBaseContext(LocaleHelper.onAttach(base, "zh"));
+        } else {
+            super.attachBaseContext(LocaleHelper.onAttach(base, ""));
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-
-        // takagen : Language Changer : WIP
-        // lContext = LocaleHelper.setLocale(this, "zh");
-        // lRresources = lContext.getResources();
-
         try {
             if (screenRatio < 0) {
                 DisplayMetrics dm = new DisplayMetrics();
@@ -194,8 +194,10 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
     protected static BitmapDrawable globalWp = null;
 
     public void changeWallpaper(boolean force) {
-        if (!force && globalWp != null)
+        if (!force && globalWp != null) {
             getWindow().setBackgroundDrawable(globalWp);
+            return;
+        }
         try {
             File wp = new File(getFilesDir().getAbsolutePath() + "/wp");
             if (wp.exists()) {
@@ -209,13 +211,7 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
                 int picWidth = 1080;
                 int scaleX = imageWidth / picWidth;
                 int scaleY = imageHeight / picHeight;
-                int scale = 1;
-                if (scaleX > scaleY && scaleY >= 1) {
-                    scale = scaleX;
-                }
-                if (scaleX < scaleY && scaleX >= 1) {
-                    scale = scaleY;
-                }
+                int scale = Math.max(Math.max(scaleX, scaleY), 1);
                 opts.inJustDecodeBounds = false;
                 // 采样率
                 opts.inSampleSize = scale;
@@ -227,9 +223,10 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
             throwable.printStackTrace();
             globalWp = null;
         }
-        if (globalWp != null)
+        if (globalWp != null) {
             getWindow().setBackgroundDrawable(globalWp);
-        else
+        } else {
             getWindow().setBackgroundDrawableResource(R.drawable.app_bg);
+        }
     }
 }

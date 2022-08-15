@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.KeyEvent;
@@ -59,6 +58,10 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -296,7 +299,7 @@ public class DetailActivity extends BaseActivity {
                         reload = true;
                     }
                     //解决当前集不刷新的BUG
-                    if(!vodInfo.playFlag.equals(preFlag)) {
+                    if (!vodInfo.playFlag.equals(preFlag)) {
                         reload = true;
                     }
                     //选集全屏 想选集不全屏的注释下面一行
@@ -310,7 +313,8 @@ public class DetailActivity extends BaseActivity {
 
     private List<Runnable> pauseRunnable = null;
 
-    private String preFlag="";
+    private String preFlag = "";
+
     private void jumpToPlay() {
         if (vodInfo != null && vodInfo.seriesMap.get(vodInfo.playFlag).size() > 0) {
             preFlag = vodInfo.playFlag;
@@ -320,6 +324,26 @@ public class DetailActivity extends BaseActivity {
             bundle.putString("sourceKey", sourceKey);
             bundle.putSerializable("VodInfo", vodInfo);
             if (showPreview) {
+                if (previewVodInfo == null) {
+                    try {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        ObjectOutputStream oos = new ObjectOutputStream(bos);
+                        oos.writeObject(vodInfo);
+                        oos.flush();
+                        oos.close();
+                        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bos.toByteArray()));
+                        previewVodInfo = (VodInfo) ois.readObject();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (previewVodInfo != null) {
+                    previewVodInfo.playerCfg = vodInfo.playerCfg;
+                    previewVodInfo.playFlag = vodInfo.playFlag;
+                    previewVodInfo.playIndex = vodInfo.playIndex;
+                    previewVodInfo.seriesMap = vodInfo.seriesMap;
+                    bundle.putSerializable("VodInfo", previewVodInfo);
+                }
                 playFragment.setData(bundle);
             } else {
                 jumpActivity(PlayActivity.class, bundle);
@@ -333,7 +357,15 @@ public class DetailActivity extends BaseActivity {
         }
 
         if (vodInfo.seriesMap.get(vodInfo.playFlag) != null) {
-            vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.playIndex).selected = true;
+            boolean canSelect = true;
+            for (int j = 0; j < vodInfo.seriesMap.get(vodInfo.playFlag).size(); j++) {
+                if (vodInfo.seriesMap.get(vodInfo.playFlag).get(j).selected == true) {
+                    canSelect = false;
+                    break;
+                }
+            }
+            if (canSelect)
+                vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.playIndex).selected = true;
         }
 
         seriesAdapter.setNewData(vodInfo.seriesMap.get(vodInfo.playFlag));
@@ -670,7 +702,8 @@ public class DetailActivity extends BaseActivity {
 
     @Override
     public void onUserLeaveHint() {
-        if (supportsPiPMode() && showPreview) {
+        // takagen99 : Additional check for external player
+        if (supportsPiPMode() && showPreview && !playFragment.extPlay) {
             if (fullWindows) {
                 enterPictureInPictureMode();
             } else {
@@ -732,6 +765,7 @@ public class DetailActivity extends BaseActivity {
     }
 
     // preview : true 开启 false 关闭
+    VodInfo previewVodInfo = null;
     boolean showPreview = Hawk.get(HawkConfig.SHOW_PREVIEW, true);
     boolean fullWindows = false;
     ViewGroup.LayoutParams windowsPreview = null;

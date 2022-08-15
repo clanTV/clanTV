@@ -23,7 +23,7 @@
 
         <LinearLayout
             android:id="@+id/tvHistory"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -32,6 +32,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -56,16 +57,16 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center|start"
-                android:text="历史"
+                android:text="@string/hm_hist"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tvLive"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -73,6 +74,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -99,16 +101,16 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center"
-                android:text="直播"
+                android:text="@string/hm_live"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tvSearch"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -116,6 +118,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -140,17 +143,17 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center"
-                android:text="搜索"
+                android:text="@string/hm_search"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 
 
         <LinearLayout
             android:id="@+id/tvPush"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -158,6 +161,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -182,16 +186,16 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center"
-                android:text="推送"
+                android:text="@string/hm_push"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tvDrive"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -199,6 +203,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -223,16 +228,16 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center"
-                android:text="文件"
+                android:text="@string/hm_file"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tvFavorite"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -240,6 +245,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -264,16 +270,16 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center"
-                android:text="收藏"
+                android:text="@string/hm_fav"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/tvSetting"
-            android:layout_width="@dimen/vs_145"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/vs_100"
             android:layout_gravity="center"
             android:layout_margin="@dimen/vs_5"
@@ -281,6 +287,7 @@
             android:clipChildren="false"
             android:clipToPadding="false"
             android:focusable="true"
+            android:minWidth="@dimen/vs_145"
             android:orientation="horizontal"
             android:paddingLeft="@dimen/vs_15"
             android:paddingTop="@dimen/vs_15"
@@ -305,10 +312,10 @@
                 android:focusable="false"
                 android:focusableInTouchMode="false"
                 android:gravity="center"
-                android:text="设置"
+                android:text="@string/hm_setting"
                 android:textAlignment="gravity"
                 android:textColor="@color/color_CCFFFFFF"
-                android:textSize="@dimen/ts_26" />
+                android:textSize="@dimen/ts_24" />
 
         </LinearLayout>
 

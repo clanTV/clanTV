@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/vs_50"
                 android:background="@drawable/input_search"
-                android:hint="请输入要搜索的内容"
+                android:hint="@string/act_search_txt"
                 android:inputType="text"
                 android:maxLines="1"
                 android:paddingLeft="@dimen/vs_10"
@@ -46,7 +46,7 @@
                     android:background="@drawable/shape_user_focus"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="搜索"
+                    android:text="@string/act_search"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/ts_20" />
 
@@ -62,7 +62,7 @@
                     android:background="@drawable/shape_user_focus"
                     android:focusable="true"
                     android:gravity="center"
-                    android:text="清空"
+                    android:text="@string/act_search_clr"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/ts_20" />
             </LinearLayout>
@@ -112,7 +112,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/vs_10"
-            android:text="热门搜索"
+            android:text="@string/act_search_trend"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="@dimen/ts_22" />

@@ -35,7 +35,7 @@
             android:ellipsize="start"
             android:maxWidth="@dimen/vs_960"
             android:singleLine="true"
-            android:text="存储空间"
+            android:text="@string/act_drive"
             android:textColor="@android:color/white"
             android:textSize="@dimen/ts_34"
             android:textStyle="bold" />

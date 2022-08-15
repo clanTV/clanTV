@@ -7,6 +7,7 @@ import com.github.tvbox.osc.callback.LoadingCallback;
 import com.github.tvbox.osc.data.AppDataManager;
 import com.github.tvbox.osc.server.ControlManager;
 import com.github.tvbox.osc.util.HawkConfig;
+import com.github.tvbox.osc.util.LocaleHelper;
 import com.github.tvbox.osc.util.OkGoHelper;
 import com.github.tvbox.osc.util.PlayerHelper;
 import com.kingja.loadsir.core.LoadSir;
@@ -29,6 +30,8 @@ public class App extends MultiDexApplication {
         super.onCreate();
         instance = this;
         initParams();
+        // takagen99 : Initialize Locale
+        initLocale();
         // OKGo
         OkGoHelper.init();
         // 初始化Web服务器
@@ -52,6 +55,14 @@ public class App extends MultiDexApplication {
         Hawk.put(HawkConfig.DEBUG_OPEN, false);
         if (!Hawk.contains(HawkConfig.PLAY_TYPE)) {
             Hawk.put(HawkConfig.PLAY_TYPE, 1);
+        }
+    }
+
+    private void initLocale() {
+        if (Hawk.get(HawkConfig.HOME_LOCALE, 0) == 0) {
+            LocaleHelper.setLocale(App.this, "zh");
+        } else {
+            LocaleHelper.setLocale(App.this, "");
         }
     }
 

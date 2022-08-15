@@ -19,7 +19,7 @@
         android:ellipsize="end"
         android:gravity="center"
         android:singleLine="true"
-        android:text="11111111111"
+        android:text="SeriesFlag"
         android:textColor="@android:color/white"
         android:textSize="@dimen/ts_20" />
 

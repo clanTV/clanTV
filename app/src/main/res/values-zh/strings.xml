@@ -4,14 +4,26 @@
     <string name="app_home">⌂</string>
     <string name="app_source"></string>
 
-    <string name="hm_ok">*^_^*</string>
+
+    // Home Page //
+    <string name="hm_ok">加载成功</string>
+
+
     <string name="hm_notok">加载失败</string>
     <string name="hm_retry">重试</string>
     <string name="hm_cancel">取消</string>
     <string name="hm_exit">再按一次返回键退出应用</string>
     <string name="hm_date1">yyyy年 MM月 dd日</string>
     <string name="hm_date2">EE hh:mm aa</string>
+    <string name="hm_hist">历史</string>
+    <string name="hm_live">直播</string>
+    <string name="hm_search">搜索</string>
+    <string name="hm_push">推送</string>
+    <string name="hm_file">文件</string>
+    <string name="hm_fav">收藏</string>
+    <string name="hm_setting">设置</string>
 
+    // Play Detail Page //
     <string name="det_play">播放</string>
     <string name="det_expand">全屏</string>
     <string name="det_search">快搜</string>
@@ -22,18 +34,72 @@
     <string name="det_fav_star">★ 收藏</string>
     <string name="det_fav_unstar">☆ 收藏</string>
 
-    <string name="set_home">首页数据源</string>
+    // Settings Menu Page //
+    <string name="mn_config">配置地址</string>
+    <string name="mn_home">数据源</string>
+    <string name="mn_home_show">数据源显示</string>
+    <string name="mn_home_type">推荐</string>
+    <string name="mn_history_num">历史条数</string>
+    <string name="mn_wall_change">换张壁纸</string>
+    <string name="mn_wall_load">壁纸更换中</string>
+    <string name="mn_wall_reset">重置壁纸</string>
+    <string name="mn_play_type">播放器</string>
+    <string name="mn_play_decode">IJK解码</string>
+    <string name="mn_search">搜索展示</string>
+    <string name="mn_ratio">画面缩放</string>
+    <string name="mn_preview">窗口预览</string>
+    <string name="mn_webview">嗅探Webview</string>
+    <string name="mn_render">渲染方式</string>
+    <string name="mn_backup">数据备份还原</string>
+    <string name="mn_dns">安全DNS</string>
+    <string name="mn_locale">语言</string>
+    <string name="mn_about">关于</string>
 
+    // Settings Dialog Pop-Up //
+    <string name="dia_source">请选择首页数据源</string>
+    <string name="dia_hm_type">请选择首页列表数据</string>
+    <string name="dia_history">历史条数保留</string>
+    <string name="dia_player">请选择默认播放器</string>
+    <string name="dia_decode">请选择IJK解码</string>
+    <string name="dia_search">请选择搜索视图</string>
+    <string name="dia_ratio">请选择默认画面缩放</string>
+    <string name="dia_render">请选择默认渲染方式</string>
+    <string name="dia_bkres">数据备份还原</string>
+    <string name="dia_bkpkg">点击下方数据还原</string>
+    <string name="dia_dns">请选择安全DNS</string>
+    <string name="dia_locale">请选择应用语言</string>
+
+    // Settings Backup Restore Page //
     <string name="set_bkup_ok">备份成功!</string>
     <string name="set_bkup_fail">备份失败!</string>
     <string name="set_bkup_fail_hk">备份Hawk失败!</string>
     <string name="set_bkup_fail_db">DB文件不存在!</string>
     <string name="set_rest_ok">恢复成功,请重启应用!</string>
-    <string name="set_rest_fail">Restore Fail</string>
     <string name="set_rest_fail_hk">Hawk恢复失败!</string>
     <string name="set_rest_fail_db">DB文件恢复失败!</string>
     <string name="set_permission_ok">已获得存储权限</string>
     <string name="set_permission_fail1">获取存储权限失败</string>
     <string name="set_permission_fail2">获取存储权限失败,请在系统设置中开启</string>
 
+
+    // Activity Page //
+    <string name="act_fav">收藏夹</string>
+    <string name="act_fav_sel">确定键删除当前选中收藏</string>
+    <string name="act_fav_rm">删除收藏</string>
+    <string name="act_drive">存储空间</string>
+    <string name="act_hist">历史记录</string>
+    <string name="act_hist_sel">确定键删除当前选中记录</string>
+    <string name="act_hist_rm">删除记录</string>
+    <string name="act_search">搜索</string>
+    <string name="act_search_clr">清空</string>
+    <string name="act_search_del">删除</string>
+    <string name="act_search_rem">远程搜索</string>
+    <string name="act_search_trend">热门搜索</string>
+    <string name="act_search_txt">请输入要搜索的内容</string>
+    <string name="act_settings">设置</string>
+    <string name="act_home">首页</string>
+    <string name="act_player">播放器</string>
+    <string name="act_system">系统</string>
+
 </resources>
+

@@ -14,4 +14,4 @@
     android:text="@{name}"
     android:textColor="@color/color_FFFFFF"
     android:textSize="@dimen/ts_26"
-    tools:text="11111111111111" />
+    tools:text="Source Name" />
