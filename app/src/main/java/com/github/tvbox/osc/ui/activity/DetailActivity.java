@@ -165,7 +165,14 @@ public class DetailActivity extends BaseActivity {
             public void onClick(View v) {
                 if (vodInfo != null && vodInfo.seriesMap.size() > 0) {
                     vodInfo.reverseSort = !vodInfo.reverseSort;
+                    preFlag = "";
+                    if (vodInfo.seriesMap.get(vodInfo.playFlag).size() > vodInfo.playIndex) {
+                        vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.playIndex).selected = false;
+                    }
                     vodInfo.reverse();
+                    if (vodInfo.seriesMap.get(vodInfo.playFlag).size() > vodInfo.playIndex) {
+                        vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.playIndex).selected = true;
+                    }
                     insertVod(sourceKey, vodInfo);
                     seriesAdapter.notifyDataSetChanged();
                 }
