@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">TVBox</string>
-    <string name="app_home">首页</string>
+    <string name="app_name">⌂clanTV</string>
+    <string name="app_home">⌂</string>
     <string name="app_source"></string>
+
 
     // Home Page //
     <string name="hm_ok">加载成功</string>
+
+
     <string name="hm_notok">加载失败</string>
     <string name="hm_retry">重试</string>
     <string name="hm_cancel">取消</string>
@@ -78,6 +81,7 @@
     <string name="set_permission_fail1">获取存储权限失败</string>
     <string name="set_permission_fail2">获取存储权限失败,请在系统设置中开启</string>
 
+
     // Activity Page //
     <string name="act_fav">收藏夹</string>
     <string name="act_fav_sel">确定键删除当前选中收藏</string>
@@ -98,3 +102,4 @@
     <string name="act_system">系统</string>
 
 </resources>
+
