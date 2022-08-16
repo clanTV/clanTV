@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">⌂clanTV</string>
+    <string name="app_name">TVBox</string>
     <string name="app_home">Home</string>
     <string name="app_source"></string>
 
@@ -78,7 +78,6 @@
     <string name="set_permission_fail1">Failed to get Permission</string>
     <string name="set_permission_fail2">Failed to get Permission, please grant in Settings</string>
 
-
     // Activity Page //
     <string name="act_fav">Favorite</string>
     <string name="act_fav_sel">Select to</string>
@@ -99,4 +98,3 @@
     <string name="act_system">System</string>
 
 </resources>
-
