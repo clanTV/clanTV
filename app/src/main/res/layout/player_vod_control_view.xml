@@ -184,7 +184,7 @@
                 android:layout_marginEnd="@dimen/vs_2"
                 android:layout_marginRight="@dimen/vs_2"
                 android:background="@drawable/button_dialog_vod"
-                android:drawableLeft="@drawable/play_repeat"
+                android:drawableLeft="@drawable/play_replay"
                 android:focusable="true"
                 android:gravity="center"
                 android:padding="@dimen/vs_8"
