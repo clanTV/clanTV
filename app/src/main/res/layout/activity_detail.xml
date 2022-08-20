@@ -49,7 +49,7 @@
                     android:maxLines="1"
                     android:singleLine="true"
                     android:textColor="@android:color/white"
-                    android:textSize="@dimen/ts_28"
+                    android:textSize="@dimen/ts_30"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -68,7 +68,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textColor="@color/color_CCFFFFFF"
-                        android:textSize="@dimen/ts_20" />
+                        android:textSize="@dimen/ts_18" />
 
                     <TextView
                         android:id="@+id/tvYear"
@@ -80,7 +80,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textColor="@color/color_CCFFFFFF"
-                        android:textSize="@dimen/ts_20" />
+                        android:textSize="@dimen/ts_18" />
 
                     <TextView
                         android:id="@+id/tvArea"
@@ -92,7 +92,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textColor="@color/color_CCFFFFFF"
-                        android:textSize="@dimen/ts_20" />
+                        android:textSize="@dimen/ts_18" />
 
                     <TextView
                         android:id="@+id/tvLang"
@@ -104,7 +104,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textColor="@color/color_CCFFFFFF"
-                        android:textSize="@dimen/ts_20" />
+                        android:textSize="@dimen/ts_18" />
 
                     <TextView
                         android:id="@+id/tvType"
@@ -116,7 +116,7 @@
                         android:maxLines="1"
                         android:singleLine="true"
                         android:textColor="@color/color_CCFFFFFF"
-                        android:textSize="@dimen/ts_20" />
+                        android:textSize="@dimen/ts_18" />
                 </LinearLayout>
 
                 <TextView
@@ -127,7 +127,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/color_CCFFFFFF"
-                    android:textSize="@dimen/ts_20" />
+                    android:textSize="@dimen/ts_18" />
 
                 <TextView
                     android:id="@+id/tvDirector"
@@ -137,7 +137,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/color_CCFFFFFF"
-                    android:textSize="@dimen/ts_20" />
+                    android:textSize="@dimen/ts_18" />
 
                 <TextView
                     android:id="@+id/tvDes"
@@ -147,7 +147,7 @@
                     android:lineSpacingMultiplier="1.2"
                     android:maxLines="4"
                     android:textColor="@color/color_CCFFFFFF"
-                    android:textSize="@dimen/ts_20" />
+                    android:textSize="@dimen/ts_18" />
 
                 <Space
                     android:layout_width="wrap_content"
@@ -284,5 +284,6 @@
         android:layout_marginLeft="@dimen/vs_50"
         android:layout_marginTop="@dimen/vs_10"
         android:clickable="true"
+        android:focusable="false"
         android:visibility="gone" />
 </FrameLayout>

@@ -622,8 +622,8 @@ public class ModelSettingFragment extends BaseLazyFragment {
                             bundle.putBoolean("useCache", true);
                             intent.putExtras(bundle);
                             getActivity().getApplicationContext().startActivity(intent);
-                            android.os.Process.killProcess(android.os.Process.myPid());
-                            System.exit(0);
+                            //  android.os.Process.killProcess(android.os.Process.myPid());
+                            //  System.exit(0);
                         }
                     }
                 });

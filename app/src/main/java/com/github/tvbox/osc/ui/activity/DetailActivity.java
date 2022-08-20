@@ -419,14 +419,14 @@ public class DetailActivity extends BaseActivity {
                     vodInfo.sourceKey = mVideo.sourceKey;
 
                     tvName.setText(mVideo.name);
-                    setTextShow(tvSite, "来源：", ApiConfig.get().getSource(mVideo.sourceKey).getName());
-                    setTextShow(tvYear, "年份：", mVideo.year == 0 ? "" : String.valueOf(mVideo.year));
-                    setTextShow(tvArea, "地区：", mVideo.area);
-                    setTextShow(tvLang, "语言：", mVideo.lang);
-                    setTextShow(tvType, "类型：", mVideo.type);
-                    setTextShow(tvActor, "演员：", mVideo.actor);
-                    setTextShow(tvDirector, "导演：", mVideo.director);
-                    setTextShow(tvDes, "内容简介：", removeHtmlTag(mVideo.des));
+                    setTextShow(tvSite, getString(R.string.det_source), ApiConfig.get().getSource(mVideo.sourceKey).getName());
+                    setTextShow(tvYear, getString(R.string.det_year), mVideo.year == 0 ? "" : String.valueOf(mVideo.year));
+                    setTextShow(tvArea, getString(R.string.det_area), mVideo.area);
+                    setTextShow(tvLang, getString(R.string.det_lang), mVideo.lang);
+                    setTextShow(tvType, getString(R.string.det_type), mVideo.type);
+                    setTextShow(tvActor, getString(R.string.det_actor), mVideo.actor);
+                    setTextShow(tvDirector, getString(R.string.det_dir), mVideo.director);
+                    setTextShow(tvDes, getString(R.string.det_des), removeHtmlTag(mVideo.des));
                     if (!TextUtils.isEmpty(mVideo.pic)) {
                         Picasso.get()
                                 .load(DefaultConfig.checkReplaceProxy(mVideo.pic))
@@ -507,7 +507,7 @@ public class DetailActivity extends BaseActivity {
         if (content == null) {
             content = "";
         }
-        return label + "<font color=\"#FFFFFF\">" + content + "</font>";
+        return label + ": " + "<font color=\"#FFFFFF\">" + content + "</font>";
     }
 
     private void initData() {

@@ -30,6 +30,14 @@
     <string name="det_fav_del">已取消收藏</string>
     <string name="det_fav_star">★ 收藏</string>
     <string name="det_fav_unstar">☆ 收藏</string>
+    <string name="det_source">来源</string>
+    <string name="det_year">年份</string>
+    <string name="det_area">地区</string>
+    <string name="det_lang">语言</string>
+    <string name="det_type">类型</string>
+    <string name="det_actor">演员</string>
+    <string name="det_dir">导演</string>
+    <string name="det_des">简介</string>
 
     // Settings Menu Page //
     <string name="mn_config">配置地址</string>
@@ -53,8 +61,8 @@
     <string name="mn_about">关于</string>
 
     // Settings Dialog Pop-Up //
-    <string name="dia_source">请选择首页数据源</string>
-    <string name="dia_hm_type">请选择首页列表数据</string>
+    <string name="dia_source">请选择数据源</string>
+    <string name="dia_hm_type">请选择列表数据</string>
     <string name="dia_history">历史条数保留</string>
     <string name="dia_player">请选择默认播放器</string>
     <string name="dia_decode">请选择IJK解码</string>
