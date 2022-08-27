@@ -25,6 +25,8 @@
                 android:id="@+id/ivThumb"
                 android:layout_width="@dimen/vs_240"
                 android:layout_height="@dimen/vs_320"
+                android:clickable="true"
+                android:focusable="false"
                 android:scaleType="fitXY" />
 
             <View

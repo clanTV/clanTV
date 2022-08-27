@@ -169,7 +169,7 @@ public class HomeActivity extends BaseActivity {
                     HomeActivity.this.sortFocusView = view;
                     HomeActivity.this.sortFocused = position;
                     mHandler.removeCallbacks(mDataRunnable);
-                    mHandler.postDelayed(mDataRunnable, 1000);
+                    mHandler.postDelayed(mDataRunnable, 300);
                 }
             }
 
@@ -595,7 +595,7 @@ public class HomeActivity extends BaseActivity {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
                     if (homeSourceKey != null && !homeSourceKey.equals(Hawk.get(HawkConfig.HOME_API, ""))) {
-                        Intent intent =new Intent(getApplicationContext(), HomeActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         Bundle bundle = new Bundle();
                         bundle.putBoolean("useCache", true);

@@ -189,6 +189,14 @@ public class DetailActivity extends BaseActivity {
                 }
             }
         });
+        // takagen99 : Added click Image Thummb or Preview Window to play video
+        ivThumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FastClickCheckUtil.check(v);
+                jumpToPlay();
+            }
+        });
         llPlayerFragmentContainerBlock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -507,7 +515,10 @@ public class DetailActivity extends BaseActivity {
         if (content == null) {
             content = "";
         }
-        return label + ": " + "<font color=\"#FFFFFF\">" + content + "</font>";
+        if (label.length() > 0) {
+            label = label + ": ";
+        }
+        return label + "<font color=\"#FFFFFF\">" + content + "</font>";
     }
 
     private void initData() {

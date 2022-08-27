@@ -37,7 +37,7 @@
     <string name="det_type">Genre</string>
     <string name="det_actor">Star</string>
     <string name="det_dir">Director</string>
-    <string name="det_des">About</string>
+    <string name="det_des"></string>
 
     // Settings Menu Page //
     <string name="mn_config">Configuration Address</string>

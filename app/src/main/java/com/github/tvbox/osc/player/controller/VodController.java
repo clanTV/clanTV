@@ -1,8 +1,8 @@
 package com.github.tvbox.osc.player.controller;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -22,6 +22,7 @@ import com.github.tvbox.osc.bean.IJKCode;
 import com.github.tvbox.osc.bean.ParseBean;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
+import com.github.tvbox.osc.player.thirdparty.Kodi;
 import com.github.tvbox.osc.ui.adapter.ParseAdapter;
 import com.github.tvbox.osc.util.HawkConfig;
 import com.github.tvbox.osc.util.PlayerHelper;
@@ -33,7 +34,11 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import xyz.doikki.videoplayer.player.VideoView;
 import xyz.doikki.videoplayer.util.PlayerUtils;
@@ -56,30 +61,52 @@ public class VodController extends BaseController {
                         break;
                     }
                     case 1002: { // 显示底部菜单
+                        mTopHide.setVisibility(GONE);
+                        mTopRoot.setVisibility(VISIBLE);
+                        TranslateAnimation animateT = new TranslateAnimation(
+                                0,                // fromXDelta
+                                0,                  // toXDelta
+                                -mTopRoot.getHeight(),       // fromYDelta
+                                0);                 // toYDelta
+                        animateT.setDuration(400);
+                        animateT.setFillAfter(true);
+                        mTopRoot.startAnimation(animateT);
+
                         mBottomRoot.setVisibility(VISIBLE);
-                        TranslateAnimation animate = new TranslateAnimation(
+                        TranslateAnimation animateB = new TranslateAnimation(
                                 0,                // fromXDelta
                                 0,                  // toXDelta
                                 mBottomRoot.getHeight(),    // fromYDelta
                                 0);                 // toYDelta
-                        animate.setDuration(400);
-                        animate.setFillAfter(true);
-                        mBottomRoot.startAnimation(animate);
+                        animateB.setDuration(400);
+                        animateB.setFillAfter(true);
+                        mBottomRoot.startAnimation(animateB);
                         mBottomRoot.requestFocus();
                         break;
                     }
                     case 1003: { // 隐藏底部菜单
-                        TranslateAnimation animate = new TranslateAnimation(
+                        TranslateAnimation animateT = new TranslateAnimation(
+                                0,                 // fromXDelta
+                                0,                   // toXDelta
+                                0,                 // fromYDelta
+                                -1100);
+                        animateT.setDuration(800);
+                        animateT.setFillAfter(true);
+                        mTopRoot.startAnimation(animateT);
+                        mTopRoot.setVisibility(GONE);
+
+                        TranslateAnimation animateB = new TranslateAnimation(
                                 0,                 // fromXDelta
                                 0,                   // toXDelta
                                 0,                 // fromYDelta
                                 //mBottomRoot.getHeight());  // toYDelta
                                 // takagen99: Quick fix VOD controller shows after PIP
                                 1200);
-                        animate.setDuration(800);
-                        animate.setFillAfter(true);
-                        mBottomRoot.startAnimation(animate);
+                        animateB.setDuration(800);
+                        animateB.setFillAfter(true);
+                        mBottomRoot.startAnimation(animateB);
                         mBottomRoot.setVisibility(GONE);
+                        mBottomRoot.clearAnimation();;
                         break;
                     }
                     case 1004: { // 设置速度
@@ -106,6 +133,8 @@ public class VodController extends BaseController {
     LinearLayout mProgressRoot;
     TextView mProgressText;
     ImageView mProgressIcon;
+    LinearLayout mTopRoot;
+    LinearLayout mTopHide;
     LinearLayout mBottomRoot;
     LinearLayout mParseRoot;
     TvRecyclerView mGridView;
@@ -120,6 +149,10 @@ public class VodController extends BaseController {
     TextView mPlayerTimeStartBtn;
     TextView mPlayerTimeSkipBtn;
     TextView mPlayerTimeStepBtn;
+    TextView mPlayerResolution;
+
+    TextView mTime;
+    TextView mTimeEnd;
 
     // takagen99 : Added for Fast Forward Button
     TextView mPlayerFFwd;
@@ -127,16 +160,31 @@ public class VodController extends BaseController {
     Drawable dPlay = getResources().getDrawable(R.drawable.play_play);
     Drawable dFFwd = getResources().getDrawable(R.drawable.play_ffwd);
 
+    // takagen99 : To get system time
+    private Runnable mTimeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Date date = new Date();
+            SimpleDateFormat timeFormat = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+            mTime.setText(timeFormat.format(date));
+            mHandler.postDelayed(this, 1000);
+        }
+    };
+
     @Override
     protected void initView() {
         super.initView();
         mCurrentTime = findViewById(R.id.curr_time);
         mTotalTime = findViewById(R.id.total_time);
-        mPlayTitle = findViewById(R.id.tv_info_name);
+        mPlayTitle = findViewById(R.id.tv_title_top);
+        mTime = findViewById(R.id.tv_time);
+        mTimeEnd = findViewById(R.id.tv_time_end);
         mSeekBar = findViewById(R.id.seekBar);
         mProgressRoot = findViewById(R.id.tv_progress_container);
         mProgressIcon = findViewById(R.id.tv_progress_icon);
         mProgressText = findViewById(R.id.tv_progress_text);
+        mTopRoot = findViewById(R.id.top_container);
+        mTopHide = findViewById(R.id.top_container_hide);
         mBottomRoot = findViewById(R.id.bottom_container);
         mParseRoot = findViewById(R.id.parse_root);
         mGridView = findViewById(R.id.mGridView);
@@ -151,7 +199,9 @@ public class VodController extends BaseController {
         mPlayerTimeSkipBtn = findViewById(R.id.play_time_end);
         mPlayerTimeStepBtn = findViewById(R.id.play_time_step);
         mPlayerFFwd = findViewById(R.id.play_ff);
+        mPlayerResolution = findViewById(R.id.tv_resolution);
 
+        mTopRoot.setVisibility(INVISIBLE);
         mBottomRoot.setVisibility(INVISIBLE);
 
         mGridView.setLayoutManager(new V7LinearLayoutManager(getContext(), 0, false));
@@ -180,7 +230,6 @@ public class VodController extends BaseController {
                 if (!fromUser) {
                     return;
                 }
-
                 long duration = mControlWrapper.getDuration();
                 long newPosition = (duration * progress) / seekBar.getMax();
                 if (mCurrentTime != null)
@@ -214,7 +263,11 @@ public class VodController extends BaseController {
         mNextBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.playNext(false);
+                if (isPaused) {
+                    togglePlay();
+                } else {
+                    listener.playNext(false);
+                }
                 hideBottom();
             }
         });
@@ -291,7 +344,9 @@ public class VodController extends BaseController {
                             playerVail = mxPlayerExist;
                         } else if (playerType == 11) {
                             playerVail = reexPlayerExist;
-                        } else if (playerType > 11) {
+                        } else if (playerType == 12) {
+                            playerVail = KodiExist;
+                        } else if (playerType > 12) {
                             playerType = 0;
                             playerVail = true;
                         }
@@ -417,7 +472,7 @@ public class VodController extends BaseController {
                 return true;
             }
         });
-
+        // takagen99: Add fastforward button
         mPlayerFFwd.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -455,12 +510,14 @@ public class VodController extends BaseController {
 
     private boolean mxPlayerExist = false;
     private boolean reexPlayerExist = false;
+    private boolean KodiExist = false;
 
     public void setPlayerConfig(JSONObject playerCfg) {
         this.mPlayerConfig = playerCfg;
         updatePlayerCfgView();
         mxPlayerExist = MXPlayer.getPackageInfo() != null;
         reexPlayerExist = ReexPlayer.getPackageInfo() != null;
+        KodiExist = Kodi.getPackageInfo() != null;
     }
 
     void updatePlayerCfgView() {
@@ -512,6 +569,7 @@ public class VodController extends BaseController {
 
     private boolean skipEnd = true;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void setProgress(int duration, int position) {
         if (mIsDragging) {
@@ -530,6 +588,18 @@ public class VodController extends BaseController {
                 listener.playNext(true);
             }
         }
+        // takagen99 : Add Video Resolution
+        if (mControlWrapper.getVideoSize().length >= 2) {
+            mPlayerResolution.setText(mControlWrapper.getVideoSize()[0] + " x " + mControlWrapper.getVideoSize()[1]);
+        }
+        // takagen99 : Calculate finish time
+        long TimeRemaining = mControlWrapper.getDuration() - mControlWrapper.getCurrentPosition();
+        Calendar date = Calendar.getInstance();
+        long t = date.getTimeInMillis();
+        Date afterAdd = new Date(t + TimeRemaining);
+        SimpleDateFormat timeEnd = new SimpleDateFormat("hh:mm aa", Locale.ENGLISH);
+        mTimeEnd.setText("Ends at " + timeEnd.format(afterAdd));
+
         mCurrentTime.setText(PlayerUtils.stringForTime(position));
         mTotalTime.setText(PlayerUtils.stringForTime(duration));
         if (duration > 0) {
@@ -600,9 +670,11 @@ public class VodController extends BaseController {
             case VideoView.STATE_IDLE:
                 break;
             case VideoView.STATE_PLAYING:
+                isPaused = false;
                 startProgress();
                 break;
             case VideoView.STATE_PAUSED:
+                isPaused = true;
                 break;
             case VideoView.STATE_ERROR:
                 listener.errReplay();
@@ -626,6 +698,7 @@ public class VodController extends BaseController {
     void showBottom() {
         mHandler.removeMessages(1003);
         mHandler.sendEmptyMessage(1002);
+        mHandler.post(mTimeRunnable);
         mHandler.postDelayed(mHideBottomRunnable, 10000);
     }
 
@@ -641,6 +714,9 @@ public class VodController extends BaseController {
         mHandler.sendEmptyMessage(1003);
         mHandler.removeCallbacks(mHideBottomRunnable);
     }
+
+    // takagen99 : Check Pause
+    private boolean isPaused = false;
 
     @Override
     public boolean onKeyEvent(KeyEvent event) {
@@ -665,6 +741,9 @@ public class VodController extends BaseController {
             } else if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
                 if (isInPlayback) {
                     togglePlay();
+                    if (!isBottomVisible() && isPaused) {
+                        showBottom();
+                    }
                     return true;
                 }
 //            } else if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {   // takagen99 : Up to show

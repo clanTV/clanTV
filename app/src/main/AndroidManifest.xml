@@ -15,7 +15,6 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
@@ -48,25 +47,19 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
-            android:configChanges=
-                "screenSize|smallestScreenSize|screenLayout|orientation">
-        </activity>
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"></activity>
         <activity
             android:name=".ui.activity.DetailActivity"
             android:theme="@style/AppTheme.ActionBar"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
-            android:configChanges=
-                "screenSize|smallestScreenSize|screenLayout|orientation">
-        </activity>
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"></activity>
         <activity
             android:name=".ui.activity.PlayActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
-            android:configChanges=
-                "screenSize|smallestScreenSize|screenLayout|orientation">
-        </activity>
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"></activity>
         <activity
             android:name=".ui.activity.PushActivity"
             android:screenOrientation="sensorLandscape" />

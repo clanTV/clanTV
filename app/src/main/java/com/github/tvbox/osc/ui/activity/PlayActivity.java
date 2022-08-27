@@ -46,6 +46,7 @@ import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.player.controller.VodController;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
+import com.github.tvbox.osc.player.thirdparty.Kodi;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
@@ -175,7 +176,8 @@ public class PlayActivity extends BaseActivity {
                 } else {
                     String preProgressKey = progressKey;
                     PlayActivity.this.playNext();
-                    if (rmProgress && preProgressKey != null) CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
+                    if (rmProgress && preProgressKey != null)
+                        CacheManager.delete(MD5.string2MD5(preProgressKey), 0);
                 }
             }
 
@@ -272,6 +274,11 @@ public class PlayActivity extends BaseActivity {
                                     case 11: {
                                         extPlay = true;
                                         callResult = ReexPlayer.run(PlayActivity.this, url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                    case 12: {
+                                        extPlay = true;
+                                        callResult = Kodi.run(PlayActivity.this, url, playTitle, playSubtitle, headers);
                                         break;
                                     }
                                 }
@@ -392,11 +399,13 @@ public class PlayActivity extends BaseActivity {
 
     // takagen99 : Add check for external players not enter PIP
     private boolean extPlay = false;
+
     public boolean supportsPiPMode() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
+
     @Override
-    public void onUserLeaveHint () {
+    public void onUserLeaveHint() {
         if (supportsPiPMode() && !extPlay) {
             enterPictureInPictureMode();
         }
@@ -422,6 +431,7 @@ public class PlayActivity extends BaseActivity {
 
     // takagen99 : Use onStopCalled to track close activity
     private boolean onStopCalled;
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -430,6 +440,7 @@ public class PlayActivity extends BaseActivity {
             mVideoView.resume();
         }
     }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -454,6 +465,7 @@ public class PlayActivity extends BaseActivity {
             }
         }
     }
+
     // takagen99 : PIP fix to close video when close window
     @Override
     public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode) {
@@ -489,7 +501,7 @@ public class PlayActivity extends BaseActivity {
         if (mVodInfo == null || mVodInfo.seriesMap.get(mVodInfo.playFlag) == null) {
             hasNext = false;
         } else {
-            if (mVodInfo.reverseSort){
+            if (mVodInfo.reverseSort) {
                 hasNext = mVodInfo.playIndex - 1 >= 0;
             } else {
                 hasNext = mVodInfo.playIndex + 1 < mVodInfo.seriesMap.get(mVodInfo.playFlag).size();
@@ -499,7 +511,7 @@ public class PlayActivity extends BaseActivity {
             Toast.makeText(this, "已经是最后一集了!", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (mVodInfo.reverseSort){
+        if (mVodInfo.reverseSort) {
             mVodInfo.playIndex--;
         } else {
             mVodInfo.playIndex++;
@@ -512,7 +524,7 @@ public class PlayActivity extends BaseActivity {
         if (mVodInfo == null || mVodInfo.seriesMap.get(mVodInfo.playFlag) == null) {
             hasPre = false;
         } else {
-            if (mVodInfo.reverseSort){
+            if (mVodInfo.reverseSort) {
                 hasPre = mVodInfo.playIndex + 1 < mVodInfo.seriesMap.get(mVodInfo.playFlag).size();
             } else {
                 hasPre = mVodInfo.playIndex - 1 >= 0;
@@ -522,7 +534,7 @@ public class PlayActivity extends BaseActivity {
             Toast.makeText(this, "已经是第一集了!", Toast.LENGTH_SHORT).show();
             return;
         }
-        if (mVodInfo.reverseSort){
+        if (mVodInfo.reverseSort) {
             mVodInfo.playIndex++;
         } else {
             mVodInfo.playIndex--;
@@ -553,15 +565,17 @@ public class PlayActivity extends BaseActivity {
         playUrl(null, null);
         String progressKey = mVodInfo.sourceKey + mVodInfo.id + mVodInfo.playFlag + mVodInfo.playIndex;
         //重新播放清除现有进度
-        if (reset) {CacheManager.delete(MD5.string2MD5(progressKey), 0);}
-        if(vs.url.startsWith("tvbox-drive://")) {
+        if (reset) {
+            CacheManager.delete(MD5.string2MD5(progressKey), 0);
+        }
+        if (vs.url.startsWith("tvbox-drive://")) {
             mController.showParse(false);
             HashMap<String, String> headers = null;
-            if(mVodInfo.playerCfg != null && mVodInfo.playerCfg.length() > 0) {
+            if (mVodInfo.playerCfg != null && mVodInfo.playerCfg.length() > 0) {
                 JsonObject playerConfig = JsonParser.parseString(mVodInfo.playerCfg).getAsJsonObject();
-                if(playerConfig.has("headers")) {
+                if (playerConfig.has("headers")) {
                     headers = new HashMap<>();
-                    for (JsonElement headerEl: playerConfig.getAsJsonArray("headers")) {
+                    for (JsonElement headerEl : playerConfig.getAsJsonArray("headers")) {
                         JsonObject headerJson = headerEl.getAsJsonObject();
                         headers.put(headerJson.get("name").getAsString(), headerJson.get("value").getAsString());
                     }

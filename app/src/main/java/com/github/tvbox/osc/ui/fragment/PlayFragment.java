@@ -45,6 +45,7 @@ import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.player.controller.VodController;
 import com.github.tvbox.osc.player.thirdparty.MXPlayer;
 import com.github.tvbox.osc.player.thirdparty.ReexPlayer;
+import com.github.tvbox.osc.player.thirdparty.Kodi;
 import com.github.tvbox.osc.util.AdBlocker;
 import com.github.tvbox.osc.util.DefaultConfig;
 import com.github.tvbox.osc.util.HawkConfig;
@@ -256,6 +257,11 @@ public class PlayFragment extends BaseLazyFragment {
                                     case 11: {
                                         extPlay = true;
                                         callResult = ReexPlayer.run(requireActivity(), url, playTitle, playSubtitle, headers);
+                                        break;
+                                    }
+                                    case 12: {
+                                        extPlay = true;
+                                        callResult = Kodi.run(requireActivity(), url, playTitle, playSubtitle, headers);
                                         break;
                                     }
                                 }

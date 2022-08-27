@@ -303,6 +303,5 @@ public abstract class BaseLazyFragment extends Fragment implements CustomAdapt {
         return true;
     }
 
-    public void scrollTop(){}
 
 }
