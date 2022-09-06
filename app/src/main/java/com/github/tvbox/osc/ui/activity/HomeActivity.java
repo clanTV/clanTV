@@ -146,7 +146,7 @@ public class HomeActivity extends BaseActivity {
         this.mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
             public void onItemPreSelected(TvRecyclerView tvRecyclerView, View view, int position) {
                 if (view != null && !HomeActivity.this.isDownOrUp) {
-                    view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(800).start();
+                    view.animate().scaleX(1.0f).scaleY(1.0f).setDuration(250).start();
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(false);
                     textView.setTextColor(HomeActivity.this.getResources().getColor(R.color.color_BBFFFFFF));
@@ -159,7 +159,7 @@ public class HomeActivity extends BaseActivity {
                 if (view != null) {
                     HomeActivity.this.isDownOrUp = false;
                     HomeActivity.this.sortChange = true;
-                    view.animate().scaleX(1.1f).scaleY(1.1f).setInterpolator(new BounceInterpolator()).setDuration(800).start();
+                    view.animate().scaleX(1.1f).scaleY(1.1f).setInterpolator(new BounceInterpolator()).setDuration(250).start();
                     TextView textView = view.findViewById(R.id.tvTitle);
                     textView.getPaint().setFakeBoldText(true);
                     textView.setTextColor(HomeActivity.this.getResources().getColor(R.color.color_FFFFFF));
@@ -169,7 +169,7 @@ public class HomeActivity extends BaseActivity {
                     HomeActivity.this.sortFocusView = view;
                     HomeActivity.this.sortFocused = position;
                     mHandler.removeCallbacks(mDataRunnable);
-                    mHandler.postDelayed(mDataRunnable, 300);
+                    mHandler.postDelayed(mDataRunnable, 200);
                 }
             }
 
@@ -202,7 +202,7 @@ public class HomeActivity extends BaseActivity {
             }
         });
         setLoadSir(this.contentLayout);
-        //mHandler.postDelayed(mFindFocus, 500);
+        //mHandler.postDelayed(mFindFocus, 250);
     }
 
     private void initViewModel() {
@@ -481,6 +481,21 @@ public class HomeActivity extends BaseActivity {
         }
     };
 
+//    private void test() {
+//        if (sortChange) {
+//            sortChange = false;
+//            if (sortFocused != currentSelected) {
+//                currentSelected = sortFocused;
+//                mViewPager.setCurrentItem(sortFocused, true);
+//                if (sortFocused == 0) {
+//                    changeTop(false);
+//                } else {
+//                    changeTop(true);
+//                }
+//            }
+//        }
+//    }
+
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (topHide < 0)
@@ -532,7 +547,7 @@ public class HomeActivity extends BaseActivity {
                                     Integer.valueOf(AutoSizeUtils.mm2px(this.mContext, 1.0f))
                             }),
                     ObjectAnimator.ofFloat(this.topLayout, "alpha", new float[]{1.0f, 0.0f})});
-            animatorSet.setDuration(200);
+            animatorSet.setDuration(250);
             animatorSet.start();
             return;
         }
@@ -549,7 +564,7 @@ public class HomeActivity extends BaseActivity {
                                     Integer.valueOf(AutoSizeUtils.mm2px(this.mContext, 50.0f))
                             }),
                     ObjectAnimator.ofFloat(this.topLayout, "alpha", new float[]{0.0f, 1.0f})});
-            animatorSet.setDuration(200);
+            animatorSet.setDuration(250);
             animatorSet.start();
             return;
         }

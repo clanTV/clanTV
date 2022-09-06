@@ -131,10 +131,7 @@ public class LivePlayActivity extends BaseActivity {
         initLiveSettingGroupList();
     }
 
-    // takagen99
-    public boolean supportsPiPMode() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-    }
+    // takagen99 : Enter PIP if supported
     @Override
     public void onUserLeaveHint () {
         if (supportsPiPMode()) {
@@ -180,7 +177,9 @@ public class LivePlayActivity extends BaseActivity {
                             playNext();
                         break;
                     case KeyEvent.KEYCODE_DPAD_LEFT:
-                        playPreSource();
+                        // takagen99 : To cater for newer Android w no Menu button
+                        // playPreSource();
+                        showSettingGroup();
                         break;
                     case KeyEvent.KEYCODE_DPAD_RIGHT:
                         playNextSource();
@@ -293,7 +292,7 @@ public class LivePlayActivity extends BaseActivity {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         mHandler.removeCallbacks(mHideChannelListRun);
-                        mHandler.postDelayed(mHideChannelListRun, 5000);
+                        mHandler.postDelayed(mHideChannelListRun, 8000);
                     }
                 });
                 animator.start();
@@ -322,8 +321,8 @@ public class LivePlayActivity extends BaseActivity {
     };
 
     private void showChannelInfo() {
-        tvChannelInfo.setText(String.format(Locale.getDefault(), "%d %s %s(%d/%d)", currentLiveChannelItem.getChannelNum(),
-                currentLiveChannelItem.getChannelName(), currentLiveChannelItem.getSourceName(),
+        tvChannelInfo.setText(String.format(Locale.getDefault(), "%d %s (%d/%d)", currentLiveChannelItem.getChannelNum(),
+                currentLiveChannelItem.getChannelName(),
                 currentLiveChannelItem.getSourceIndex() + 1, currentLiveChannelItem.getSourceNum()));
 
         FrameLayout.LayoutParams lParams = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -336,11 +335,11 @@ public class LivePlayActivity extends BaseActivity {
             lParams.rightMargin = 60;
             lParams.topMargin = 30;
         }
-        tvChannelInfo.setLayoutParams(lParams);
+      //  tvChannelInfo.setLayoutParams(lParams);
 
         tvChannelInfo.setVisibility(View.VISIBLE);
         mHandler.removeCallbacks(mHideChannelInfoRun);
-        mHandler.postDelayed(mHideChannelInfoRun, 3000);
+        mHandler.postDelayed(mHideChannelInfoRun, 8000);
     }
 
     private Runnable mHideChannelInfoRun = new Runnable() {
@@ -425,6 +424,7 @@ public class LivePlayActivity extends BaseActivity {
                 if (holder != null)
                     holder.itemView.requestFocus();
                 tvRightSettingLayout.setVisibility(View.VISIBLE);
+                tvChannelInfo.setVisibility(View.INVISIBLE);
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) tvRightSettingLayout.getLayoutParams();
                 if (tvRightSettingLayout.getVisibility() == View.VISIBLE) {
                     ViewObj viewObj = new ViewObj(tvRightSettingLayout, params);
@@ -434,7 +434,7 @@ public class LivePlayActivity extends BaseActivity {
                         @Override
                         public void onAnimationEnd(Animator animation) {
                             super.onAnimationEnd(animation);
-                            mHandler.postDelayed(mHideSettingLayoutRun, 5000);
+                            mHandler.postDelayed(mHideSettingLayoutRun, 8000);
                         }
                     });
                     animator.start();

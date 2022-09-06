@@ -31,12 +31,12 @@
     <string name="det_fav_del">Removed from Favorite</string>
     <string name="det_fav_star">★ Favorite</string>
     <string name="det_fav_unstar">☆ Favorite</string>
-    <string name="det_source">Source</string>
+    <string name="det_source"></string>
     <string name="det_year">Year</string>
     <string name="det_area">Area</string>
     <string name="det_lang">Language</string>
     <string name="det_type">Genre</string>
-    <string name="det_actor">Star</string>
+    <string name="det_actor">Cast</string>
     <string name="det_dir">Director</string>
     <string name="det_des"></string>
 

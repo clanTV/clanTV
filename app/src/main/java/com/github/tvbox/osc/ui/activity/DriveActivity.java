@@ -1,90 +1,67 @@
 package com.github.tvbox.osc.ui.activity;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.ColorStateList;
-import android.graphics.ColorFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.KeyEvent;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.BounceInterpolator;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DiffUtil;
-import androidx.viewpager.widget.ViewPager;
 
-import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.github.tvbox.osc.R;
-import com.github.tvbox.osc.api.ApiConfig;
 import com.github.tvbox.osc.base.App;
 import com.github.tvbox.osc.base.BaseActivity;
-import com.github.tvbox.osc.base.BaseLazyFragment;
-import com.github.tvbox.osc.bean.AbsSortXml;
 import com.github.tvbox.osc.bean.DriveFolderFile;
-import com.github.tvbox.osc.bean.Movie;
-import com.github.tvbox.osc.bean.MovieSort;
 import com.github.tvbox.osc.bean.VodInfo;
 import com.github.tvbox.osc.cache.RoomDataManger;
 import com.github.tvbox.osc.cache.StorageDrive;
 import com.github.tvbox.osc.event.RefreshEvent;
 import com.github.tvbox.osc.ui.adapter.DriveAdapter;
-import com.github.tvbox.osc.ui.adapter.HomePageAdapter;
 import com.github.tvbox.osc.ui.adapter.SelectDialogAdapter;
-import com.github.tvbox.osc.ui.adapter.SortAdapter;
+import com.github.tvbox.osc.ui.dialog.AlistDriveDialog;
 import com.github.tvbox.osc.ui.dialog.SelectDialog;
 import com.github.tvbox.osc.ui.dialog.WebdavDialog;
-import com.github.tvbox.osc.ui.fragment.GridFragment;
-import com.github.tvbox.osc.ui.tv.widget.DefaultTransformer;
-import com.github.tvbox.osc.ui.tv.widget.FixedSpeedScroller;
-import com.github.tvbox.osc.ui.tv.widget.NoScrollViewPager;
 import com.github.tvbox.osc.util.FastClickCheckUtil;
 import com.github.tvbox.osc.util.HawkConfig;
-import com.github.tvbox.osc.util.PlayerHelper;
 import com.github.tvbox.osc.util.StorageDriveType;
+import com.github.tvbox.osc.viewmodel.drive.AbstractDriveViewModel;
+import com.github.tvbox.osc.viewmodel.drive.AlistDriveViewModel;
+import com.github.tvbox.osc.viewmodel.drive.LocalDriveViewModel;
+import com.github.tvbox.osc.viewmodel.drive.WebDAVDriveViewModel;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.lzy.okgo.OkGo;
 import com.obsez.android.lib.filechooser.ChooserDialog;
 import com.orhanobut.hawk.Hawk;
 import com.owen.tvrecyclerview.widget.TvRecyclerView;
 import com.owen.tvrecyclerview.widget.V7LinearLayoutManager;
-import com.thegrizzlylabs.sardineandroid.DavResource;
-import com.thegrizzlylabs.sardineandroid.Sardine;
 
-import org.chromium.ui.widget.ButtonCompat;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import jcifs.smb.SmbFile;
 import me.jessyan.autosize.utils.AutoSizeUtils;
 
 public class DriveActivity extends BaseActivity {
@@ -96,9 +73,14 @@ public class DriveActivity extends BaseActivity {
     private ImageButton btnSort;
     private DriveAdapter adapter = new DriveAdapter();
     private List<DriveFolderFile> drives = null;
-    private DriveFolderFile currentDrive = null;
-    private DriveFolderFile driveNode = null;
+    List<DriveFolderFile> searchResult = null;
+    private AbstractDriveViewModel viewModel = null;
+    private AbstractDriveViewModel backupViewModel = null;
     private int sortType = 0;
+    private ExecutorService searchExecutorService = null;
+    private AtomicInteger allSearchCount = new AtomicInteger(0);
+    private View footLoading;
+    private boolean isInSearch = false;
 
     private boolean isRight;
     private boolean sortChange = false;
@@ -123,11 +105,14 @@ public class DriveActivity extends BaseActivity {
 
     private void initView() {
         EventBus.getDefault().register(this);
+        searchExecutorService = Executors.newFixedThreadPool(5);
         this.txtTitle = findViewById(R.id.textView);
         this.btnAddServer = findViewById(R.id.btnAddServer);
         this.mGridView = findViewById(R.id.mGridView);
         this.btnRemoveServer = findViewById(R.id.btnRemoveServer);
         this.btnSort = findViewById(R.id.btnSort);
+        footLoading = getLayoutInflater().inflate(R.layout.item_search_lite, null);
+        footLoading.findViewById(R.id.tvName).setVisibility(View.GONE);
         this.btnRemoveServer.setColorFilter(ContextCompat.getColor(mContext, R.color.color_FFFFFF));
         this.btnRemoveServer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -170,9 +155,11 @@ public class DriveActivity extends BaseActivity {
                             }
                             openFilePicker();
                             dialog.dismiss();
-                        }
-                        if (value == StorageDriveType.TYPE.WEBDAV) {
+                        } else if (value == StorageDriveType.TYPE.WEBDAV) {
                             openWebdavDialog(null);
+                            dialog.dismiss();
+                        } else if (value == StorageDriveType.TYPE.ALISTWEB) {
+                            openAlistDriveDialog(null);
                             dialog.dismiss();
                         }
                     }
@@ -196,7 +183,7 @@ public class DriveActivity extends BaseActivity {
             }
         });
         this.mGridView.setLayoutManager(new V7LinearLayoutManager(this.mContext, V7LinearLayoutManager.VERTICAL, false));
-        this.mGridView.setSpacingWithMargins(AutoSizeUtils.mm2px(this.mContext, 5), 0);
+        this.mGridView.setSpacingWithMargins(AutoSizeUtils.mm2px(this.mContext, 10), 0);
         this.mGridView.setAdapter(this.adapter);
         this.adapter.bindToRecyclerView(this.mGridView);
         this.mGridView.setOnItemListener(new TvRecyclerView.OnItemListener() {
@@ -220,29 +207,65 @@ public class DriveActivity extends BaseActivity {
                 }
                 btnAddServer.setVisibility(View.GONE);
                 btnRemoveServer.setVisibility(View.GONE);
-                if (currentDrive == null) {
-                    currentDrive = drives.get(position);
-                    initSwitch();
+                DriveFolderFile selectedItem = DriveActivity.this.adapter.getItem(position);
+                if ((selectedItem == selectedItem.parentFolder || selectedItem.parentFolder == null) && selectedItem.name == null) {
+                    returnPreviousFolder();
+                    return;
+                }
+                if (viewModel == null) {
+                    if (selectedItem.getDriveType() == StorageDriveType.TYPE.LOCAL) {
+                        viewModel = new LocalDriveViewModel();
+                    } else if (selectedItem.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
+                        viewModel = new WebDAVDriveViewModel();
+                    } else if (selectedItem.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
+                        viewModel = new AlistDriveViewModel();
+                    }
+                    viewModel.setCurrentDrive(selectedItem);
+                    if (!selectedItem.isFile) {
+                        loadDriveData();
+                        return;
+                    }
+                }
+                if (!selectedItem.isFile) {
+                    viewModel.setCurrentDriveNote(selectedItem);
+                    loadDriveData();
                 } else {
-                    DriveFolderFile selectedItem = DriveActivity.this.adapter.getItem(position);
-                    if (selectedItem == selectedItem.parentFolder && selectedItem.name == null) {
-                        returnPreviousFolder();
-                    } else if (!selectedItem.isFile) {
-                        driveNode = selectedItem;
-                        initSwitch();
-                    } else {
-                        // takagen99 - To only play media file
-                        if (StorageDriveType.isVideoType(selectedItem.fileType)) {
-                            if (currentDrive.getDriveType() == StorageDriveType.TYPE.LOCAL) {
-                                 playFile(currentDrive.name + selectedItem.getAccessingPathStr() + selectedItem.name);
-                            } else if (currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
-                                JsonObject config = currentDrive.getConfig();
-                                String targetPath = selectedItem.getAccessingPathStr() + selectedItem.name;
-                                playFile(config.get("url").getAsString() + targetPath);
-                            }
-                        } else {
-                            Toast.makeText(DriveActivity.this, "Media Unsupported", Toast.LENGTH_SHORT).show();
+                    // takagen99 - To only play media file
+                    if (StorageDriveType.isVideoType(selectedItem.fileType)) {
+                        DriveFolderFile currentDrive = viewModel.getCurrentDrive();
+                        if (currentDrive.getDriveType() == StorageDriveType.TYPE.LOCAL)
+                            playFile(currentDrive.name + selectedItem.getAccessingPathStr() + selectedItem.name);
+                        else if (currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
+                            JsonObject config = currentDrive.getConfig();
+                            String targetPath = selectedItem.getAccessingPathStr() + selectedItem.name;
+                            playFile(config.get("url").getAsString() + targetPath);
+                        } else if (currentDrive.getDriveType() == StorageDriveType.TYPE.ALISTWEB) {
+                            AlistDriveViewModel boxedViewModel = (AlistDriveViewModel) viewModel;
+                            boxedViewModel.loadFile(selectedItem, new AlistDriveViewModel.LoadFileCallback() {
+                                @Override
+                                public void callback(String fileUrl) {
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            playFile(fileUrl);
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void fail(String msg) {
+                                    mHandler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            Toast toast = Toast.makeText(mContext, msg, Toast.LENGTH_SHORT);
+                                            toast.show();
+                                        }
+                                    });
+                                }
+                            });
                         }
+                    } else {
+                        Toast.makeText(DriveActivity.this, "Media Unsupported", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -254,6 +277,7 @@ public class DriveActivity extends BaseActivity {
         VodInfo vodInfo = new VodInfo();
         vodInfo.name = "存储";
         vodInfo.playFlag = "drive";
+        DriveFolderFile currentDrive = viewModel.getCurrentDrive();
         if (currentDrive.getDriveType() == StorageDriveType.TYPE.WEBDAV) {
             String credentialStr = currentDrive.getWebDAVBase64Credential();
             if (credentialStr != null) {
@@ -292,7 +316,7 @@ public class DriveActivity extends BaseActivity {
                 sortType = pos;
                 Hawk.put(HawkConfig.STORAGE_DRIVE_SORT, pos);
                 dialog.dismiss();
-                initSwitch();
+                loadDriveData();
             }
 
             @Override
@@ -319,15 +343,6 @@ public class DriveActivity extends BaseActivity {
         }
     };
 
-    private void sortData(List<DriveFolderFile> data) {
-        DriveFolderFile backItem = null;
-        if (data.size() > 0 && data.get(0).name == null)
-            backItem = data.remove(0);
-        Collections.sort(data, sortComparator);
-        if (backItem != null)
-            data.add(0, backItem);
-    }
-
     private void openFilePicker() {
         if (delMode)
             toggleDelMode();
@@ -344,7 +359,7 @@ public class DriveActivity extends BaseActivity {
                         String absPath = dirFile.getAbsolutePath();
                         for (DriveFolderFile drive : drives) {
                             if (drive.getDriveType() == StorageDriveType.TYPE.LOCAL && absPath.equals(drive.getDriveData().name)) {
-                                Toast.makeText(DriveActivity.this, "此文件夹之前已被添加到空间列表！", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(mContext, "此文件夹之前已被添加到空间列表！", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         }
@@ -353,27 +368,16 @@ public class DriveActivity extends BaseActivity {
                         return;
                     }
                 }).show();
-//        FilePickerManager
-//                .from(this)
-//                .filter(new AbstractFileFilter() {
-//                    @NonNull
-//                    @Override
-//                    public ArrayList<FileItemBeanImpl> doFilter(@NonNull ArrayList<FileItemBeanImpl> arrayList) {
-//                        ArrayList<FileItemBeanImpl> filteredList = new ArrayList<>();
-//                        for (FileItemBeanImpl bean : arrayList) {
-//                            if(bean.isDir())
-//                                filteredList.add(bean);
-//                        }
-//                        return filteredList;
-//                    }
-//                })
-//                .skipDirWhenSelect(false)
-//                .forResult(FilePickerManager.REQUEST_CODE);
     }
 
     private void openWebdavDialog(StorageDrive drive) {
         WebdavDialog webdavDialog = new WebdavDialog(mContext, drive);
         webdavDialog.show();
+    }
+
+    private void openAlistDriveDialog(StorageDrive drive) {
+        AlistDriveDialog dialog = new AlistDriveDialog(mContext, drive);
+        dialog.show();
     }
 
     public void toggleDelMode() {
@@ -386,40 +390,8 @@ public class DriveActivity extends BaseActivity {
         adapter.toggleDelMode(delMode);
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == FilePickerManager.REQUEST_CODE) {
-//            if (resultCode == Activity.RESULT_OK) {
-//                List<String> paths = FilePickerManager.obtainData();
-//                if(paths.size() > 0) {
-//                    List<String> existingPaths = new ArrayList<>();
-//                    for(DriveFolderFile drive : drives) {
-//                        if(drive.getDriveType() == StorageDriveType.TYPE.LOCAL)
-//                            existingPaths.add(drive.getDriveData().name);
-//                    }
-//                    for (String path : paths) {
-//                        boolean foundExist = false;
-//                        for(String existingPath : existingPaths) {
-//                            if(path.equals(existingPath)) {
-//                                foundExist = true;
-//                                break;
-//                            }
-//                        }
-//                        if(foundExist)
-//                            continue;
-//                        RoomDataManger.insertDriveRecord(path, StorageDriveType.TYPE.LOCAL, null);
-//                    }
-//                    EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_DRIVE_REFRESH));
-//                    return;
-//                }
-//            }
-//            Toast.makeText(this, "没有选择任何本地目录哦！", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     private void initData() {
-        this.txtTitle.setText(getString(R.string.act_drive));
+        this.txtTitle.setText("存储空间");
         sortType = Hawk.get(HawkConfig.STORAGE_DRIVE_SORT, 0);
         btnSort.setVisibility(View.GONE);
         if (drives == null) {
@@ -455,217 +427,166 @@ public class DriveActivity extends BaseActivity {
         mGridView.setSelection(0);
     }
 
-    private void initLocal() {
-        if (driveNode == null)
-            driveNode = new DriveFolderFile(null, "", false, null, null);
-        String path = currentDrive.name + driveNode.getAccessingPathStr() + driveNode.name;
+    private void loadDriveData() {
+        viewModel.setSortType(sortType);
+        btnSort.setVisibility(View.VISIBLE);
+        showLoading();
+        String path = viewModel.loadData(new AbstractDriveViewModel.LoadDataCallback() {
+            @Override
+            public void callback(List<DriveFolderFile> list, boolean alreadyHasChildren) {
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showSuccess();
+                        if (alreadyHasChildren) {
+                            adapter.setNewData(viewModel.getCurrentDriveNote().getChildren());
+                            setSelectedItem(viewModel.getCurrentDriveNote().getChildren());
+                        } else {
+                            adapter.setNewData(viewModel.getCurrentDriveNote().getChildren());
+                            mHandler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mGridView.setSelection(0);
+                                }
+                            }, 50);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void fail(String message) {
+                showSuccess();
+                mHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
         this.txtTitle.setText(path);
-        if (driveNode.getChildren() == null) {
-            File[] files = (new File(path)).listFiles();
-            List<DriveFolderFile> items = new ArrayList<>();
-            if (files != null) {
-                for (File file : files) {
-                    int extNameStartIndex = file.getName().lastIndexOf(".");
-                    items.add(new DriveFolderFile(driveNode, file.getName(), file.isFile(),
-                            file.isFile() && extNameStartIndex >= 0 && extNameStartIndex < file.getName().length() ?
-                                    file.getName().substring(extNameStartIndex + 1) : null,
-                            file.lastModified()));
+    }
+
+    private void search(String keyword) {
+        isInSearch = true;
+        backupViewModel = viewModel;
+        viewModel = null;
+        btnSort.setVisibility(View.GONE);
+        showLoading();
+        List<AbstractDriveViewModel> viewModels = new ArrayList<>();
+        if (viewModel != null)
+            viewModels.add(viewModel);
+        else {
+            for (DriveFolderFile drive : drives) {
+                AbstractDriveViewModel searchViewModel = null;
+                if (drive.getDriveType() == StorageDriveType.TYPE.LOCAL)
+                    searchViewModel = new LocalDriveViewModel();
+                else if (drive.getDriveType() == StorageDriveType.TYPE.WEBDAV)
+                    searchViewModel = new WebDAVDriveViewModel();
+                else if (drive.getDriveType() == StorageDriveType.TYPE.ALISTWEB)
+                    searchViewModel = new AlistDriveViewModel();
+                if (searchViewModel != null) {
+                    allSearchCount.incrementAndGet();
+                    searchViewModel.setCurrentDrive(drive);
+                    viewModels.add(searchViewModel);
                 }
             }
-            sortData(items);
-            DriveFolderFile backItem = new DriveFolderFile(null, null, false, null, null);
-            backItem.parentFolder = backItem;
-            items.add(0, backItem);
-            driveNode.setChildren(items);
-            adapter.setNewData(driveNode.getChildren());
-            mHandler.postDelayed(new Runnable() {
+        }
+        searchResult = new ArrayList<>();
+        DriveFolderFile backItem = new DriveFolderFile(null, null, false, null, null);
+        backItem.parentFolder = backItem;
+        searchResult.add(0, backItem);
+        adapter.setNewData(searchResult);
+        adapter.setFooterView(footLoading);
+        Object syncLocker = new Object();
+        for (AbstractDriveViewModel searchViewModel : viewModels) {
+            Runnable runnable = searchViewModel.search(keyword, new AbstractDriveViewModel.LoadDataCallback() {
                 @Override
-                public void run() {
-                    mGridView.setSelection(0);
-                }
-            }, 50);
-        } else {
-            sortData(driveNode.getChildren());
-            adapter.setNewData(driveNode.getChildren());
-            setSelectedItem(driveNode.getChildren());
-        }
-    }
-
-    private void initWebDAV() {
-        JsonObject config = currentDrive.getConfig();
-        if (driveNode == null) {
-            driveNode = new DriveFolderFile(null,
-                    config.has("initPath") ? config.get("initPath").getAsString() : "", false, null, null);
-        }
-        if (driveNode.getChildren() == null) {
-            showLoading();
-            new Thread() {
-                public void run() {
-                    Sardine webDAV = currentDrive.getWebDAV();
-                    if (webDAV == null) {
-                        showSuccess();
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, "无法访问该WebDAV地址", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        return;
-                    }
-                    List<DavResource> files = null;
-                    String targetPath = driveNode.getAccessingPathStr() + driveNode.name;
-                    try {
-                        files = webDAV.list(config.get("url").getAsString() + targetPath);
-                    } catch (Exception ex) {
-                        showSuccess();
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, "无法访问该WebDAV地址", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        return;
-                    }
-
-                    List<DriveFolderFile> items = new ArrayList<>();
-                    if (files != null) {
-                        for (DavResource file : files) {
-                            if (targetPath != null && file.getPath().toUpperCase(Locale.ROOT).endsWith(targetPath.toUpperCase(Locale.ROOT) + "/"))
-                                continue;
-                            int extNameStartIndex = file.getName().lastIndexOf(".");
-                            items.add(new DriveFolderFile(driveNode, file.getName(), !file.isDirectory(),
-                                    !file.isDirectory() && extNameStartIndex >= 0 && extNameStartIndex < file.getName().length() ?
-                                            file.getName().substring(extNameStartIndex + 1) : null,
-                                    file.getModified().getTime()));
-                        }
-                    }
-                    sortData(items);
-                    DriveFolderFile backItem = new DriveFolderFile(null, null, false, null, null);
-                    backItem.parentFolder = backItem;
-                    items.add(0, backItem);
-                    driveNode.setChildren(items);
-                    mHandler.postDelayed(new Runnable() {
+                public void callback(List<DriveFolderFile> list, boolean alreadyHasChildren) {
+                    mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.setNewData(driveNode.getChildren());
-                            DriveActivity.this.txtTitle.setText(currentDrive.name + ": " + targetPath);
-                            mGridView.setSelection(0);
-                            showSuccess();
+                            synchronized (syncLocker) {
+                                try {
+                                    showSuccess();
+                                    int count = allSearchCount.decrementAndGet();
+                                    if (count <= 0) {
+                                        //Toast.makeText(mContext, "搜索完毕！", Toast.LENGTH_SHORT).show();
+                                        adapter.removeFooterView(footLoading);
+                                    }
+                                    if (list != null) {
+                                        searchResult.addAll(list);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
                         }
-                    }, 50);
-
+                    });
                 }
-            }.start();
-        } else {
-            String targetPath = driveNode.getAccessingPathStr() + driveNode.name;
-            DriveActivity.this.txtTitle.setText(currentDrive.name + ": " + targetPath);
-            sortData(driveNode.getChildren());
-            adapter.setNewData(driveNode.getChildren());
-            setSelectedItem(driveNode.getChildren());
-        }
-    }
 
-    private void initSMB() {
-        JsonObject config = currentDrive.getConfig();
-        if (driveNode == null) {
-            driveNode = new DriveFolderFile(null, "", false, null, null);
-        }
-        if (driveNode.getChildren() == null) {
-            showLoading();
-            new Thread() {
-                public void run() {
-                    Sardine webDAV = currentDrive.getWebDAV();
-                    if (webDAV == null) {
-                        showSuccess();
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, "无法访问该WebDAV地址", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        return;
-                    }
-                    List<DavResource> files = null;
-                    String targetPath = driveNode.getAccessingPathStr() + driveNode.name;
-                    try {
-                        files = webDAV.list(config.get("url").getAsString() + targetPath);
-                    } catch (Exception ex) {
-                        showSuccess();
-                        mHandler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(mContext, "无法访问该WebDAV地址", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        return;
-                    }
-
-                    List<DriveFolderFile> items = new ArrayList<>();
-                    if (files != null) {
-                        for (DavResource file : files) {
-                            if (targetPath != null && file.getPath().toUpperCase(Locale.ROOT).endsWith(targetPath.toUpperCase(Locale.ROOT) + "/"))
-                                continue;
-                            int extNameStartIndex = file.getName().lastIndexOf(".");
-                            items.add(new DriveFolderFile(driveNode, file.getName(), !file.isDirectory(),
-                                    !file.isDirectory() && extNameStartIndex >= 0 && extNameStartIndex < file.getName().length() ?
-                                            file.getName().substring(extNameStartIndex + 1) : null,
-                                    file.getModified().getTime()));
-                        }
-                    }
-                    sortData(items);
-                    DriveFolderFile backItem = new DriveFolderFile(null, null, false, null, null);
-                    backItem.parentFolder = backItem;
-                    items.add(0, backItem);
-                    driveNode.setChildren(items);
-                    mHandler.postDelayed(new Runnable() {
+                @Override
+                public void fail(String message) {
+                    showSuccess();
+                    mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            adapter.setNewData(driveNode.getChildren());
-                            DriveActivity.this.txtTitle.setText(currentDrive.name + ": " + targetPath);
-                            mGridView.setSelection(0);
-                            showSuccess();
+                            Toast.makeText(mContext, message, Toast.LENGTH_SHORT).show();
                         }
-                    }, 50);
-
+                    });
                 }
-            }.start();
-        } else {
-            String targetPath = driveNode.getAccessingPathStr() + driveNode.name;
-            DriveActivity.this.txtTitle.setText(currentDrive.name + ": " + targetPath);
-            sortData(driveNode.getChildren());
-            adapter.setNewData(driveNode.getChildren());
-            setSelectedItem(driveNode.getChildren());
+            });
+            searchExecutorService.execute(runnable);
         }
+        this.txtTitle.setText("搜索结果");
+    }
+
+    private void cancel() {
+        OkGo.getInstance().cancelTag("drive");
     }
 
     private void returnPreviousFolder() {
-        driveNode.setChildren(null);
-        driveNode = driveNode.parentFolder;
-        if (driveNode == null) {
-            currentDrive = null;
+        if (isInSearch && viewModel == null) {
+            //if already in search list
+            isInSearch = false;
+            viewModel = backupViewModel;
+            backupViewModel = null;
+            if (viewModel == null) {
+                //if no last view list, return to main menu
+                initData();
+            } else {
+                //return to last view list
+                loadDriveData();
+            }
+            return;
+        }
+        viewModel.getCurrentDriveNote().setChildren(null);
+        viewModel.setCurrentDriveNote(viewModel.getCurrentDriveNote().parentFolder);
+        if (viewModel.getCurrentDriveNote() == null) {
+            if (isInSearch) {
+                //if returns from a search result, back to search result
+                this.txtTitle.setText("搜索结果");
+                adapter.setNewData(searchResult);
+                viewModel = null;
+                return;
+            }
+            viewModel = null;
             initData();
             return;
         }
-        initSwitch();
-    }
-
-    private void initSwitch() {
-        btnSort.setVisibility(View.VISIBLE);
-        switch (currentDrive.getDriveType()) {
-            case LOCAL:
-                initLocal();
-                break;
-            case WEBDAV:
-                initWebDAV();
-                break;
-        }
+        loadDriveData();
     }
 
     @Override
     public void onBackPressed() {
-        if (currentDrive != null)
+        if (viewModel != null) {
+            cancel();
             mGridView.onClick(mGridView.getChildAt(0));
-        else if (!delMode)
+            return;
+        }
+        if (!delMode)
             super.onBackPressed();
         else
             toggleDelMode();

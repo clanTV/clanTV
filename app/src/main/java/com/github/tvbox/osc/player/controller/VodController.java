@@ -1,14 +1,15 @@
 package com.github.tvbox.osc.player.controller;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
 import android.os.Message;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -62,58 +63,110 @@ public class VodController extends BaseController {
                         break;
                     }
                     case 1002: { // 显示底部菜单
+//                        mTopHide.setVisibility(GONE);
+//                        mTopRoot.setVisibility(VISIBLE);
+//                        TranslateAnimation animateT = new TranslateAnimation(
+//                                0,                // fromXDelta
+//                                0,                  // toXDelta
+//                                -mTopRoot.getHeight(),       // fromYDelta
+//                                0);                 // toYDelta
+//                        animateT.setDuration(400);
+//                        animateT.setFillAfter(true);
+//                        mTopRoot.startAnimation(animateT);
+//
+//                        mBottomRoot.setVisibility(VISIBLE);
+//                        TranslateAnimation animateB = new TranslateAnimation(
+//                                0,                // fromXDelta
+//                                0,                  // toXDelta
+//                                mBottomRoot.getHeight(),    // fromYDelta
+//                                0);                 // toYDelta
+//                        animateB.setDuration(400);
+//                        animateB.setFillAfter(true);
+//                        mBottomRoot.startAnimation(animateB);
+//                        mBottomRoot.requestFocus();
+
+                        // takagen99 : Revamp Show & Hide Logic with alpha
                         mTopHide.setVisibility(GONE);
                         mTopRoot.setVisibility(VISIBLE);
-                        TranslateAnimation animateT = new TranslateAnimation(
-                                0,                // fromXDelta
-                                0,                  // toXDelta
-                                -mTopRoot.getHeight(),       // fromYDelta
-                                0);                 // toYDelta
-                        animateT.setDuration(400);
-                        animateT.setFillAfter(true);
-                        mTopRoot.startAnimation(animateT);
+                        mTopRoot.setAlpha(0.0f);
+                        mTopRoot.setTranslationY(-mTopRoot.getHeight());
+                        mTopRoot.animate()
+                                .translationY(0)
+                                .alpha(1.0f)
+                                .setDuration(400)
+                                .setInterpolator(new DecelerateInterpolator())
+                                .setListener(null);
 
                         mBottomRoot.setVisibility(VISIBLE);
-                        TranslateAnimation animateB = new TranslateAnimation(
-                                0,                // fromXDelta
-                                0,                  // toXDelta
-                                mBottomRoot.getHeight(),    // fromYDelta
-                                0);                 // toYDelta
-                        animateB.setDuration(400);
-                        animateB.setFillAfter(true);
-                        mBottomRoot.startAnimation(animateB);
+                        mBottomRoot.setAlpha(0.0f);
+                        mBottomRoot.setTranslationY(mBottomRoot.getHeight());
+                        mBottomRoot.animate()
+                                .translationY(0)
+                                .alpha(1.0f)
+                                .setDuration(400)
+                                .setInterpolator(new DecelerateInterpolator())
+                                .setListener(null);
                         mBottomRoot.requestFocus();
                         break;
                     }
                     case 1003: { // 隐藏底部菜单
-                        TranslateAnimation animateT = new TranslateAnimation(
-                                0,                 // fromXDelta
-                                0,                   // toXDelta
-                                0,                 // fromYDelta
-                                -1100);
-                        animateT.setDuration(800);
-                        animateT.setFillAfter(true);
-                        mTopRoot.startAnimation(animateT);
-                        mTopRoot.setVisibility(GONE);
+//                        TranslateAnimation animateT = new TranslateAnimation(
+//                                0,                 // fromXDelta
+//                                0,                   // toXDelta
+//                                0,                 // fromYDelta
+//                                -mTopRoot.getHeight());
+//                        animateT.setDuration(400);
+//                        animateT.setFillAfter(true);
+//                        mTopRoot.startAnimation(animateT);
+//                        mTopRoot.setVisibility(GONE);
+//
+//                        TranslateAnimation animateB = new TranslateAnimation(
+//                                0,                 // fromXDelta
+//                                0,                   // toXDelta
+//                                0,                 // fromYDelta
+//                                //mBottomRoot.getHeight());  // toYDelta
+//                                // takagen99: Quick fix VOD controller shows after PIP
+//                                mBottomRoot.getHeight());
+//                        animateB.setDuration(400);
+//                        animateB.setFillAfter(true);
+//                        mBottomRoot.startAnimation(animateB);
+//                        mBottomRoot.setVisibility(GONE);
+//
+//                        new Handler().postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                mBottomRoot.clearAnimation();
+//                            }
+//                        }, 450);
 
-                        TranslateAnimation animateB = new TranslateAnimation(
-                                0,                 // fromXDelta
-                                0,                   // toXDelta
-                                0,                 // fromYDelta
-                                //mBottomRoot.getHeight());  // toYDelta
-                                // takagen99: Quick fix VOD controller shows after PIP
-                                1200);
-                        animateB.setDuration(800);
-                        animateB.setFillAfter(true);
-                        mBottomRoot.startAnimation(animateB);
-                        mBottomRoot.setVisibility(GONE);
+                        // takagen99 : Revamp Show & Hide Logic with alpha
+                        mTopRoot.animate()
+                                .translationY(-mTopRoot.getHeight())
+                                .alpha(0.0f)
+                                .setDuration(400)
+                                .setInterpolator(new DecelerateInterpolator())
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        mTopRoot.setVisibility(View.GONE);
+                                        mTopRoot.clearAnimation();
+                                    }
+                                });
 
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mBottomRoot.clearAnimation();;
-                            }
-                        }, 1000);
+                        mBottomRoot.animate()
+                                .translationY(mBottomRoot.getHeight())
+                                .alpha(0.0f)
+                                .setDuration(400)
+                                .setInterpolator(new DecelerateInterpolator())
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        mBottomRoot.setVisibility(View.GONE);
+                                        mBottomRoot.clearAnimation();
+                                    }
+                                });
                         break;
                     }
                     case 1004: { // 设置速度
@@ -288,6 +341,8 @@ public class VodController extends BaseController {
         mPlayerScaleBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                mHandler.removeCallbacks(mHideBottomRunnable);
+                mHandler.postDelayed(mHideBottomRunnable, 10000);
                 try {
                     int scaleType = mPlayerConfig.getInt("sc");
                     scaleType++;
@@ -305,6 +360,8 @@ public class VodController extends BaseController {
         mPlayerSpeedBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                mHandler.removeCallbacks(mHideBottomRunnable);
+                mHandler.postDelayed(mHideBottomRunnable, 10000);
                 try {
                     float speed = (float) mPlayerConfig.getDouble("sp");
                     speed += 0.25f;
@@ -399,6 +456,8 @@ public class VodController extends BaseController {
         mPlayerTimeStartBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                mHandler.removeCallbacks(mHideBottomRunnable);
+                mHandler.postDelayed(mHideBottomRunnable, 10000);
                 try {
                     int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
                     int st = mPlayerConfig.getInt("st");
@@ -430,6 +489,8 @@ public class VodController extends BaseController {
         mPlayerTimeSkipBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                mHandler.removeCallbacks(mHideBottomRunnable);
+                mHandler.postDelayed(mHideBottomRunnable, 10000);
                 try {
                     int step = Hawk.get(HawkConfig.PLAY_TIME_STEP, 5);
                     int et = mPlayerConfig.getInt("et");
@@ -595,10 +656,6 @@ public class VodController extends BaseController {
                 listener.playNext(true);
             }
         }
-        // takagen99 : Add Video Resolution
-        if (mControlWrapper.getVideoSize().length >= 2) {
-            mPlayerResolution.setText(mControlWrapper.getVideoSize()[0] + " x " + mControlWrapper.getVideoSize()[1]);
-        }
         // takagen99 : Calculate finish time
         long TimeRemaining = mControlWrapper.getDuration() - mControlWrapper.getCurrentPosition();
         Calendar date = Calendar.getInstance();
@@ -687,6 +744,10 @@ public class VodController extends BaseController {
                 listener.errReplay();
                 break;
             case VideoView.STATE_PREPARED:
+                // takagen99 : Add Video Resolution
+                if (mControlWrapper.getVideoSize().length >= 2) {
+                    mPlayerResolution.setText(mControlWrapper.getVideoSize()[0] + " x " + mControlWrapper.getVideoSize()[1]);
+                }
             case VideoView.STATE_BUFFERED:
                 break;
             case VideoView.STATE_PREPARING:

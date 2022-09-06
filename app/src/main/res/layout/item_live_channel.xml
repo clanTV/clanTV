@@ -15,6 +15,10 @@
         android:id="@+id/tvChannelNum"
         android:layout_width="60mm"
         android:layout_height="60mm"
+        android:layout_marginStart="@dimen/vs_5"
+        android:layout_marginLeft="@dimen/vs_5"
+        android:layout_marginEnd="@dimen/vs_5"
+        android:layout_marginRight="@dimen/vs_5"
         android:ellipsize="marquee"
         android:gravity="center"
         android:marqueeRepeatLimit="marquee_forever"
@@ -23,7 +27,7 @@
         android:shadowRadius="2"
         android:singleLine="true"
         android:textColor="@android:color/white"
-        android:textSize="22mm"
+        android:textSize="@dimen/ts_26"
         android:textStyle="bold" />
 
     <TextView
@@ -32,7 +36,7 @@
         android:layout_height="60mm"
         android:layout_weight="1"
         android:ellipsize="marquee"
-        android:gravity="left"
+        android:gravity="left|center_vertical"
         android:marqueeRepeatLimit="marquee_forever"
         android:shadowDx="0"
         android:shadowDy="0"

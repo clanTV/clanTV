@@ -81,6 +81,10 @@ public class WebdavDialog extends BaseDialog {
                     url += "/";
                 JsonObject config = new JsonObject();
                 config.addProperty("url", url);
+                if(initPath.length() > 0 && initPath.startsWith("/"))
+                    initPath = initPath.substring(1);
+                if(initPath.length() > 0 && initPath.endsWith("/"))
+                    initPath = initPath.substring(0, initPath.length() - 1);
                 config.addProperty("initPath", initPath);
                 config.addProperty("username", username);
                 config.addProperty("password", password);

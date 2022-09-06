@@ -10,7 +10,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.DisplayMetrics;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,17 +87,39 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
         changeWallpaper(false);
     }
 
-    // takagen99 : Show Navbar on screen
+    // takagen99 : Check for Gesture or 3-Buttons NavBar
+    // 0 : 3-Button NavBar
+    // 1 : 2-Button NavBar (Android P)
+    // 2 : Gesture full screen
+    public static int isEdgeToEdgeEnabled(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("config_navBarInteractionMode", "integer", "android");
+        if (resourceId > 0) {
+            return resources.getInteger(resourceId);
+        }
+        return 0;
+    }
+
+    // takagen99 : If 3-Buttons NavBar, show Navbar. Else hide
     public void hideSysBar() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
-            uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-            //    uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
-            uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-            //    uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-            uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-            uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-            getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+            if (isEdgeToEdgeEnabled(mContext) == 0) {
+                int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
+                uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+                uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+                uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+            } else {
+                int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
+                uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+                uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+                uiOptions |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+                uiOptions |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                uiOptions |= View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;
+                uiOptions |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+                getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+            }
         }
     }
 
@@ -189,6 +214,10 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomAd
     @Override
     public boolean isBaseOnWidth() {
         return !(screenRatio >= 4.0f);
+    }
+
+    public boolean supportsPiPMode() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
     }
 
     protected static BitmapDrawable globalWp = null;

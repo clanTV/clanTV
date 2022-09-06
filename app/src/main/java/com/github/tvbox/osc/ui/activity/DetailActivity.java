@@ -720,11 +720,6 @@ public class DetailActivity extends BaseActivity {
         EventBus.getDefault().unregister(this);
     }
 
-    // takagen99 : Check for PiP supported
-    public boolean supportsPiPMode() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
-    }
-
     @Override
     public void onUserLeaveHint() {
         // takagen99 : Additional check for external player
@@ -744,8 +739,8 @@ public class DetailActivity extends BaseActivity {
             if (playFragment.onBackPressed())
                 return;
             toggleFullPreview();
-            // takagen99 : Show Nav Bar
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // takagen99 : If 3-Buttons NavBar, hide Navbar.
+            if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) && isEdgeToEdgeEnabled(mContext) == 0) {
                 int uiOptions = getWindow().getDecorView().getSystemUiVisibility();
                 uiOptions &= ~View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
                 uiOptions &= ~View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION;

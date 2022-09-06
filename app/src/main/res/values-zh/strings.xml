@@ -31,7 +31,7 @@
     <string name="det_fav_del">已取消收藏</string>
     <string name="det_fav_star">★ 收藏</string>
     <string name="det_fav_unstar">☆ 收藏</string>
-    <string name="det_source">来源</string>
+    <string name="det_source"></string>
     <string name="det_year">年份</string>
     <string name="det_area">地区</string>
     <string name="det_lang">语言</string>
